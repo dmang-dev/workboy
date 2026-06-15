@@ -1,0 +1,22 @@
+name: ci
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install GBDK-2020
+        run: |
+          curl -L -o gbdk.tar.gz https://github.com/gbdk-2020/gbdk-2020/releases/latest/download/gbdk-linux64.tar.gz
+          mkdir -p tools && tar -xzf gbdk.tar.gz -C tools
+
+      - name: Install Python toolchains
+        run: pip install platformio build123d
+
+      - name: Run CI (sim + ROM + firmware + case)
+        run: python tests/run_ci.py
