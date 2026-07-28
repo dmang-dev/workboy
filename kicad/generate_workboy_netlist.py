@@ -54,17 +54,24 @@ FP_LINK  = "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"  # link 
 FP_LINK_SOCKET  = "workboy:GB_EXT_Socket_6P"
 EMIT_LINK_SOCKET = False   # <- flip to True after drawing the footprint
 
-# J5 is the third option: shape the BOARD EDGE itself into the link plug - a ~6 mm
-# tongue carrying 3 pads top and 3 bottom, inserted straight into the console's
-# link socket. Costs no parts at all, but unlike J1/J4 it is NOT free:
-#   * it changes the board OUTLINE, so the case must be re-fitted around it
-#   * an inserted/removed edge wants ENIG gold, not HASL, or the pads wear
-#   * the socket is nominally ~1.2 mm; standard 1.6 mm board is a tight fit
-#   * it plugs the board DIRECTLY into the console - rigid, no cable - which
-#     suits a compact variant, not a keyboard you sit and type on
-# Best treated as a break-off tab so one fab run yields both variants.
+# J5 - BOARD-EDGE TONGUE. *** DECIDED AGAINST for rev A (2026-07-28). ***
+# Kept here, inert, because the analysis is worth not repeating.
+#
+# The idea: shape the board edge itself into the link plug - a ~6 mm tongue with
+# 3 pads top and 3 bottom, inserted straight into the console's link socket. Zero
+# parts. Unlike J1/J4 it is NOT free:
+#   * changes the board OUTLINE, so the case must be re-fitted around it
+#   * an inserted/removed edge wants ENIG (~1.5-2.0x the bare-board line vs HASL),
+#     or the pads wear; hard "gold fingers" is ~3.0-5.0x and overkill here
+#   * the socket is nominally ~1.2 mm, so a standard 1.6 mm board is a tight fit
+#     (1.6 mm is JLCPCB's free default - thickness is a FIT issue, not a cost one)
+#   * it plugs the board DIRECTLY into the console: rigid, no cable. Fine for a
+#     compact variant, wrong for a keyboard you sit and type on - which is the
+#     whole point of this device.
+# If ever revisited: put the tongue on a break-off tab (mouse-bites / V-score) so
+# one fab run yields both variants, and order ENIG - skip hard gold.
 FP_LINK_EDGE  = "workboy:GB_EXT_EdgeTongue_6P"
-EMIT_LINK_EDGE = False   # <- flip to True after drawing the tongue + outline
+EMIT_LINK_EDGE = False   # parked - see above; leave False
 
 # ----- accumulators --------------------------------------------------------
 comps = OrderedDict()                 # ref -> (value, footprint, lcsc)

@@ -35,7 +35,20 @@ keyboard.
 
 ## 🟡 Decide before ordering
 
-### 4. Which link connector — J1, J4, J5, or all three?
+### 4. Which link connector?
+
+> ### ✅ Decision (2026-07-28): land **J1 + J4**. **J5 is parked.**
+>
+> J1 and J4 both mount on the board face and change nothing about the outline,
+> plating or thickness — landing both costs nothing and lets one fab run serve
+> either a soldered pigtail or an ordinary link cable.
+>
+> **J5 (board-edge tongue) was deliberately dropped for rev A.** It costs no
+> parts, but it forces an outline change, wants ENIG (**~1.5–2.0×** the
+> bare-board line vs HASL) because an inserted edge wears, and — decisively —
+> it plugs the board *rigidly into the console with no cable*, which is wrong
+> for a keyboard you sit and type on. The analysis is kept in
+> `generate_workboy_netlist.py` and below, so revisiting it needs no re-research.
 
 All three land on the **same six nets**; you populate exactly one. Wiring them in
 parallel is electrically free.
@@ -53,12 +66,26 @@ parallel is electrically free.
 **J1 + J4 are genuinely free** — both mount on the board face, change nothing about
 the outline, plating or thickness. Land both.
 
-**J5 is not free**, despite costing no parts. It forces board-outline, plating and
-thickness decisions, and it only really suits a compact direct-attach variant — a
-keyboard you sit and type on wants the cable. If you do want it, the tidy approach
-is a **break-off tab**: put the tongue on a mouse-bitten/V-scored stub so one fab
-run yields both variants and you snap it off when unused. Note the ENIG cost
-applies to the whole board, not just the tongue.
+**J5 — parked. Notes kept for a possible rev B.**
+
+Not free despite costing no parts:
+
+- **Outline change** — the tongue protrudes, so the case must be re-fitted and the
+  board edge redrawn.
+- **Finish** — ENIG at **~1.5–2.0×** the bare-board line (HASL is JLCPCB's free
+  default). Hard "gold fingers" is **~3.0–5.0×** plus bevelling, and is meant for
+  thousands of insertion cycles — overkill for a connector used dozens of times.
+  ENIG also *benefits the whole board* given the TQFP-32 and 0402s, so it isn't
+  purely a J5 tax. Selective finish (ENIG pads + hard gold fingers) exists if ever
+  needed.
+- **Thickness is a fit issue, not a cost one** — 1.6 mm is JLCPCB's free default;
+  the socket is nominally ~1.2 mm, so 1.6 mm is a tight insert.
+- **Ergonomics decided it** — the board plugs rigidly into the console with no
+  cable. Fine for a compact direct-attach variant; wrong for a keyboard.
+
+If revisited: put the tongue on a **break-off tab** (mouse-bites / V-score) so one
+fab run yields both variants, and order **ENIG — skip hard gold**. The netlist
+support is already written and inert behind `EMIT_LINK_EDGE = False`.
 
 **To enable J4:** buy an EXT socket (sources in [`COMPATIBILITY.md`](COMPATIBILITY.md)),
 measure it, draw `workboy:GB_EXT_Socket_6P`, set `EMIT_LINK_SOCKET = True`.
