@@ -52,17 +52,46 @@ python tests/run_ci.py
 5. **Cable:** the rear slot is for a soldered link pigtail; add a printed strain
    relief or grommet.
 
-## build123d port (Python, imports the KiCad board STEP)
-[`workboy_case_b123d.py`](workboy_case_b123d.py) is a build123d port of this model.
-It exports `workboy_top.stl`, `workboy_bottom.stl`, and a combined
-`workboy_case_assembly.step`, and — if `kicad/workboy_board.step` exists — imports
-the board and places it on the standoffs for a fit check.
+## build123d model — **the board file is the single source of truth**
+
+[`workboy_case_b123d.py`](workboy_case_b123d.py) is the maintained model. It exports
+`workboy_top.stl`, `workboy_bottom.stl` and a combined `workboy_case_assembly.step`.
+
+**Every dimension is parsed from `kicad/workboy.kicad_pcb` at build time** — the
+outline, the four mounting-hole positions, the key pitch and the key-field offset.
+Nothing is hard-coded, so the case cannot drift from the PCB. Change the board,
+re-run this, done.
 
 ```sh
-pip install build123d
-python ../kicad/make_board_step.py     # placeholder board STEP (replace with KiCad export)
+python -m venv .venv && .venv/bin/pip install build123d   # never install system-wide
 python workboy_case_b123d.py
 ```
-Once you run the KiCad layout, export the real board (`File ▸ Export ▸ STEP`) over
-`kicad/workboy_board.step` and re-run — the case aligns to the actual switch/mount
-positions.
+
+It refuses to export if the board does not fit, and reports the numbers it used:
+
+```
+board  : 152.000 x 106.125 mm, centre (150.0000, 89.0625) [from workboy.kicad_pcb]
+case   : 160.000 x 114.125 x 22.000 mm outer
+         155.200 x 109.325 mm interior (1.6 mm clearance per side)
+key    : pitch 12.0 mm measured from the board; field offset (+0.0000, +19.0625)
+mounts : 4 at (-72.000,-49.063), (-72.000,+49.062), (+72.000,-49.063), (+72.000,+49.062)
+```
+
+For the visual assembly it also imports `kicad/workboy_board.step` if present, and
+checks that the board centres, that the through-hole leads clear the floor and that
+the tallest part clears the top plate. Generate that STEP with:
+
+```sh
+kicad-cli pcb export step --output kicad/workboy_board.step kicad/workboy.kicad_pcb
+```
+
+> ⚠️ There used to be a `kicad/make_board_step.py` that produced a **placeholder
+> rectangle** into that same path — and CI ran it, so it silently overwrote the real
+> export. It has been removed. If you find it referenced anywhere, that reference is
+> stale; use the `kicad-cli` line above.
+
+> **The key field is not centred on the board.** The PCB carries a ~48 mm
+> electronics strip below the last key row, so the key field sits **+19.0625 mm**
+> from the board centre. `keymap.centers()` is origin-centred on the *key field*;
+> the case is centred on the *board*. The script derives that offset from the real
+> switch coordinates rather than assuming it.

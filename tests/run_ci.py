@@ -75,10 +75,17 @@ else:
          "" if rc == 0 else out[-160:])
 
 # 4) case export (build123d)
+#
+# Do NOT regenerate a placeholder board STEP here. This step used to run
+# kicad/make_board_step.py first, which overwrote the REAL exported board with a
+# 144 x 78 mm rectangle - so CI silently destroyed the export the case is fitted
+# to. That script is gone; produce the real one with:
+#     kicad-cli pcb export step --output kicad/workboy_board.step kicad/workboy.kicad_pcb
+# The case script derives all of its dimensions from kicad/workboy.kicad_pcb and
+# only uses the STEP for the visual assembly, so it runs fine without one.
 if not have("build123d"):
     step("case-export", "SKIP", "build123d not installed")
 else:
-    run([sys.executable, os.path.join(ROOT, "kicad", "make_board_step.py")])
     rc, out = run([sys.executable, os.path.join(ROOT, "case", "workboy_case_b123d.py")])
     ok = rc == 0 and os.path.exists(os.path.join(ROOT, "case", "workboy_top.stl"))
     step("case-export", "PASS" if ok else "FAIL", "" if ok else out[-160:])

@@ -71,36 +71,59 @@ of margin**. Hole edge sits 2.65 mm from the board edge.
 > there is no room for a fifth hole mid-span on that side. The corners are the only
 > viable positions.
 
-### 2. The real board is **152.000 × 106.125 mm** — the case is sized for 144 × 78 🔴
-*Verified directly from `Edge.Cuts` (4 `gr_line` segments): X 74.0–226.0,
-Y 36.0–142.124999 → **152.000 × 106.125 mm, 161.31 cm²**. Cross-checked against the
-exported profile gerber.*
+### 2. ~~The case is sized for 144 × 78~~ ✅ **RESOLVED 2026-07-28 — case rebuilt from the board**
 
-Three different sizes are in play and **none of the documentation is right**:
+*Was: three different board sizes in the docs and none of them right. The case
+interior was **155.2 × 71.2 mm** for a **152.000 × 106.125 mm** board — it overran
+by 34.9 mm in depth and was 30 mm deeper than the case's whole outer envelope. The
+placeholder never fitted either, so the model was unvalidated, not merely stale.*
 
-| Source | Size | Delta vs real |
+`case/workboy_case_b123d.py` was rewritten to **parse `kicad/workboy.kicad_pcb` at
+build time**. The outline, the four mounting-hole positions, the key pitch and the
+key-field offset are all read from the board — nothing is hard-coded, so the case
+cannot drift from the PCB again. It **refuses to export** if the board does not fit.
+
+| | Old | New |
 |---|---|---|
-| **Real board** (`Edge.Cuts`) | **152.000 × 106.125 mm** | — |
-| `make_board_step.py` placeholder | 144 × 78 mm | −8.000 × −28.125 |
-| `BUILD_PLAN.md` (×3 places) | ~140 × 85 mm | −12.000 × −21.125 |
+| Outer | 160 × 76 × 22 mm | **160.000 × 114.125 × 22.000 mm** |
+| Interior | 155.2 × 71.2 mm | **155.200 × 109.325 mm** |
+| vs board 152.000 × 106.125 | ✗ 34.9 mm short | ✅ **1.600 mm clearance per side** |
+| Standoffs | (±61, ±28.5) — matched no real hole | **(±72.000, ±49.0625)** = H1–H4 |
+| Sized from | key field | **the board outline** |
 
-The case interior is **155.2 × 71.2 mm**, so the real board overruns it by
-**34.9 mm** in depth — and is **30 mm deeper than the case's entire outer
-envelope**. This is not a tolerance problem; the board is ~40 % deeper than the box.
+**Verified independently** (re-derived from the board and the exported solids, not
+from the script's own claims):
 
-⚠️ **The placeholder never fit either.** Its 78 mm depth already exceeded the
-71.2 mm interior, despite the comment at `make_board_step.py:17` claiming it was
-"sized to sit inside the case interior". **Treat the case model as unvalidated, not
-merely out of date.**
+- **Key cutout alignment: worst mismatch 0.000000 mm across all 53 keys.** Every
+  cutout is centred on its switch.
+- Board centring error **0.0000 mm** in both axes.
+- **4.095 mm** of air under the protruding through-hole leads (they reach 1.905 mm
+  below the PCB — the old model never accounted for them).
+- **1.865 mm** headroom between the tallest part (18.135 mm) and the top plate.
+- `tests/run_ci.py` → `case-export PASS`.
 
-Fix: drive the case from the board outline instead of from the key field — parse
-`Edge.Cuts` so the two cannot drift apart again — then re-check standoff positions
-(one currently lands on **SW13**'s through-hole pin) and the square-corner vs
-`r=2` interior fillet interference.
+Two things the rewrite had to fix beyond size:
 
-> The case script also never re-centres the imported STEP, so the real board lands
-> ~150 mm away from the case origin. Export with an explicit origin, or translate
-> on import using the board's own bounding box.
+- **The key field is not centred on the board.** There is a ~48 mm electronics strip
+  below the last key row, so the field sits **+19.0625 mm** from the board centre.
+  `keymap.centers()` is origin-centred on the *key field*, the case on the *board*.
+  The offset is now derived from the real switch coordinates.
+- **Screw bosses and PCB standoffs had to merge.** With 1.6 mm of clearance there is
+  no room for separate corner bosses beside a board that fills the interior — they
+  would collide with it. One M2.5 screw per corner now passes through the top plate,
+  through the PCB hole, into an insert in the boss, so the same fastener closes the
+  case and retains the board. The clearance scan behind §1 already proved a 7 mm
+  boss fits at all four holes.
+
+> 🔴 **`kicad/make_board_step.py` has been deleted, and this mattered.** It wrote a
+> placeholder rectangle to `kicad/workboy_board.step` — **and `tests/run_ci.py` ran
+> it on every CI run**, silently overwriting the real exported board with a 144 × 78
+> rectangle. Regenerate the real one with:
+> ```sh
+> kicad-cli pcb export step --output kicad/workboy_board.step kicad/workboy.kicad_pcb
+> ```
+
+> ⚠️ **Remaining case work is connector access, not fit** — see §7.
 
 ### 3. ~~J3 USB-C pad names are unverified~~ ✅ **RESOLVED — false alarm**
 *Established with `pcbnew` against the placed footprint, and by diffing the board's
@@ -273,8 +296,11 @@ So the cheap "5 boards for $7–17" line in `BUILD_PLAN.md:338` **does not apply
 all** — it is a sub-100 mm price. Get a live quote at **152 × 107 mm**, 2-layer,
 1.6 mm, 1 oz, HASL, 5 pcs before committing.
 
-If the price is unacceptable, the lever is the **~10 mm key pitch** driving the
-outline — nothing electrical needs to change to shrink it.
+If the price is unacceptable, the lever is the key pitch driving the outline —
+nothing electrical needs to change to shrink it. Note the real pitch is
+**12.0 mm**, measured from the switch coordinates in the board, *not* the "~10 mm"
+quoted in `BUILD_PLAN`; the 53 switches sit on an exact 12.0 mm grid spanning
+132 × 48 mm.
 
 ### 6. Assembly split — outsource the switches or not?
 - **SMT only** (recommended in `BUILD_PLAN`): JLCPCB does the MCU, passives, 53
@@ -285,6 +311,35 @@ outline — nothing electrical needs to change to shrink it.
 
 Either way the **link connector is consigned or hand-soldered** — it is excluded
 from `workboy_jlcpcb_bom.csv` on purpose.
+
+### 7. ⚠️ The connectors sit **inland**, so nothing plugs in through a wall
+
+Found while re-fitting the case. Measured from the board, distance from the part's
+own bounding box to the nearest board edge:
+
+| | Position (case frame) | Nearest edge | Gap |
+|---|---|---|---|
+| **J3 USB-C** | X +49.24…+59.93, Y −29.87…−20.40 | +X (right) | **16.07 mm** |
+| J2 ISP | X +10.63…+16.78, Y −32.17…−23.50 | −Y (front) | 20.89 mm |
+| J1 link | X −10.12…−6.53, Y −43.60…−27.31 | −Y (front) | 9.47 mm |
+
+**J3 is the problem.** A USB-C plug cannot reach a socket 16 mm inside the board
+outline — you would need a 16 mm channel through the wall. J1 and J2 are fine:
+J1 is a soldered pigtail (a wire exit, not a plug) and J2 is a programming header
+used once with the lid off.
+
+This does **not** block the PCB order — the board is electrically correct either
+way. It is a choice about how rev A gets powered:
+
+- **Ship rev A as-is** and run a short internal USB-C pigtail from J3 to a
+  panel-mount socket in the wall. The case has a tail slot for it. Costs one extra
+  part, no board change.
+- **Move J3 to the right board edge before ordering.** The correct fix, but it means
+  re-placing, re-routing, re-running DRC and re-exporting — and it reopens a board
+  that is currently clean. Sensible only if you would rather not have a pigtail.
+
+The current case assumes the first option. Both cable exits are sized as **wire
+exits**, not plug-through ports.
 
 ---
 
@@ -327,9 +382,8 @@ from `workboy_jlcpcb_bom.csv` on purpose.
 5. Order 5. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
    `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless paying
    for THT.
-6. **Case is a separate track** — it does not gate the PCB order. Re-derive it from
-   the real outline (§2); the standoffs now have real hole positions to hit,
-   **144.000 × 98.125 mm** apart.
+6. ~~Case~~ ✅ **rebuilt from the board** (§2) — fits with 1.6 mm per side, all 53
+   cutouts aligned. Remaining case decision is **connector access** (§7), not fit.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
@@ -355,7 +409,7 @@ board file directly rather than trusting the documentation. What it changed:
 |---|---|---|
 | J3 USB-C pads | blocking | ✅ resolved — premise was factually wrong |
 | Switch pad numbering | blocking | ✅ resolved — but exposed a wrong BOM part |
-| Case fit | blocking | 🔴 still blocking, and **worse** — and the placeholder never fit either |
+| Case fit | blocking | ✅ **fixed** — case rebuilt from the board file; 53/53 cutouts align to 0.000000 mm |
 | Mounting holes | not on the list | ✅ **fixed same day** — 4 added, DRC clean, artefacts re-exported |
 | Board size | ~140 × 85 mm | **152.000 × 106.125 mm**, over the cheap tier on both axes |
 | Gerber staleness | assumed stale | ✅ current, byte-identical |
