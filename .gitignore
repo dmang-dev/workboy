@@ -4,6 +4,10 @@ tools/
 __pycache__/
 *.pyc
 
+# --- KiCad per-session lock files (present while a project is open) ---
+*.lck
+~*.lck
+
 # --- build artifacts ---
 rom/workboy_homebrew.gb
 rom/src/*.o

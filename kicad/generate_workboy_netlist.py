@@ -44,6 +44,28 @@ FP_ISP   = "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical"
 FP_USBC  = "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12"  # = LCSC C165948
 FP_LINK  = "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"  # link pigtail
 
+# J4 is the OPTIONAL alternative to J1: a real Game Boy EXT socket, so an ordinary
+# link cable plugs in instead of a soldered pigtail. Both land on the SAME nets and
+# only one is ever populated. There is no KiCad library footprint for this part - it
+# must be drawn from the physical connector, which IS purchasable as a repair part
+# (see COMPATIBILITY.md). Until that footprint exists this points at a deliberately
+# NON-EXISTENT library so KiCad fails loudly on import rather than silently
+# substituting a wrong land pattern. Set EMIT_LINK_SOCKET=True once it is drawn.
+FP_LINK_SOCKET  = "workboy:GB_EXT_Socket_6P"
+EMIT_LINK_SOCKET = False   # <- flip to True after drawing the footprint
+
+# J5 is the third option: shape the BOARD EDGE itself into the link plug - a ~6 mm
+# tongue carrying 3 pads top and 3 bottom, inserted straight into the console's
+# link socket. Costs no parts at all, but unlike J1/J4 it is NOT free:
+#   * it changes the board OUTLINE, so the case must be re-fitted around it
+#   * an inserted/removed edge wants ENIG gold, not HASL, or the pads wear
+#   * the socket is nominally ~1.2 mm; standard 1.6 mm board is a tight fit
+#   * it plugs the board DIRECTLY into the console - rigid, no cable - which
+#     suits a compact variant, not a keyboard you sit and type on
+# Best treated as a break-off tab so one fab run yields both variants.
+FP_LINK_EDGE  = "workboy:GB_EXT_EdgeTongue_6P"
+EMIT_LINK_EDGE = False   # <- flip to True after drawing the tongue + outline
+
 # ----- accumulators --------------------------------------------------------
 comps = OrderedDict()                 # ref -> (value, footprint, lcsc)
 nets  = defaultdict(list)             # netname -> [(ref, pin), ...]
@@ -130,6 +152,31 @@ n("MCU_MOSI",("J2",4)); n("nRESET",("J2",5)); n("GND",("J2",6))
 add_comp("J1", "GB-LINK", FP_LINK, "")
 n("LINK_VCC",("J1",1)); n("LINK_SO",("J1",2)); n("LINK_SI",("J1",3))
 n("LINK_SD",("J1",4));  n("LINK_SC",("J1",5)); n("GND",("J1",6))
+
+# ===========================================================================
+# J4  GB EXT socket - OPTIONAL, same nets as J1, populate ONE of the two.
+#   J1 = 0.1" header for a soldered cut-cable pigtail (works today)
+#   J4 = real EXT socket so a normal link cable plugs in (needs a drawn footprint)
+# Wiring them in parallel costs nothing on a bare board and lets one fabrication
+# run serve either approach. Pin 1 (VCC) and pin 4 (SD) stay unconnected on both:
+# the board is USB-C self-powered, and stock cables only carry 4 of the 6 pins.
+# ===========================================================================
+if EMIT_LINK_SOCKET:
+    add_comp("J4", "GB-LINK-SKT", FP_LINK_SOCKET, "")
+    n("LINK_VCC",("J4",1)); n("LINK_SO",("J4",2)); n("LINK_SI",("J4",3))
+    n("LINK_SD",("J4",4));  n("LINK_SC",("J4",5)); n("GND",("J4",6))
+
+# ===========================================================================
+# J5  GB EXT edge tongue - OPTIONAL third option, same nets again.
+# The board edge IS the plug: 3 pads top, 3 bottom, ~6 mm wide, straight into
+# the console's link socket. Zero parts. See the caveats at FP_LINK_EDGE - this
+# one changes the board outline and wants gold plating, so it is not free the
+# way J1 and J4 are. Populate exactly ONE of J1 / J4 / J5.
+# ===========================================================================
+if EMIT_LINK_EDGE:
+    add_comp("J5", "GB-LINK-EDGE", FP_LINK_EDGE, "")
+    n("LINK_VCC",("J5",1)); n("LINK_SO",("J5",2)); n("LINK_SI",("J5",3))
+    n("LINK_SD",("J5",4));  n("LINK_SC",("J5",5)); n("GND",("J5",6))
 
 # ===========================================================================
 # 8x7 key matrix: 53 switches + 53 diodes
