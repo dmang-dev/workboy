@@ -45,15 +45,24 @@ FP_USBC  = "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12"  # = LCSC C165948
 FP_LINK  = "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"  # link pigtail
 FP_MOUNT = "MountingHole:MountingHole_2.7mm_M2.5"   # plain NPTH, no copper
 
-# J4 is the OPTIONAL alternative to J1: a real Game Boy EXT socket, so an ordinary
-# link cable plugs in instead of a soldered pigtail. Both land on the SAME nets and
-# only one is ever populated. There is no KiCad library footprint for this part - it
-# must be drawn from the physical connector, which IS purchasable as a repair part
-# (see COMPATIBILITY.md). Until that footprint exists this points at a deliberately
-# NON-EXISTENT library so KiCad fails loudly on import rather than silently
-# substituting a wrong land pattern. Set EMIT_LINK_SOCKET=True once it is drawn.
+# J4 - REAL GAME BOY EXT SOCKET. *** DEFERRED TO REV B (decided 2026-07-28). ***
+#
+# The OPTIONAL alternative to J1: an ordinary link cable plugs in instead of a
+# soldered pigtail. Both land on the SAME nets and only one is ever populated.
+#
+# Why not in rev A: there is no KiCad library footprint for this part, and one
+# cannot be drawn without the physical connector in hand to measure (it IS
+# purchasable as a repair part - see COMPATIBILITY.md). Drawing it, re-importing,
+# re-placing, re-routing and re-exporting was the entire remaining critical path
+# for rev A, in exchange for cable convenience over a pigtail that works on day
+# one. Rev A proves the design; rev B can add the socket, measured against a board
+# that by then exists.
+#
+# The reference below points at a deliberately NON-EXISTENT library so that if
+# anyone flips the flag before drawing the footprint, KiCad fails loudly on import
+# rather than silently substituting a wrong land pattern.
 FP_LINK_SOCKET  = "workboy:GB_EXT_Socket_6P"
-EMIT_LINK_SOCKET = False   # <- flip to True after drawing the footprint
+EMIT_LINK_SOCKET = False   # rev A = J1 only; flip to True only AFTER drawing the footprint
 
 # J5 - BOARD-EDGE TONGUE. *** DECIDED AGAINST for rev A (2026-07-28). ***
 # Kept here, inert, because the analysis is worth not repeating.
@@ -156,18 +165,21 @@ n("MCU_MOSI",("J2",4)); n("nRESET",("J2",5)); n("GND",("J2",6))
 
 # ===========================================================================
 # J1  GB EXT link  (1=VCC NC, 2=SO, 3=SI, 4=SD NC, 5=SC, 6=GND)
+#
+# *** THIS IS THE LINK CONNECTOR REV A SHIPS. *** 1x6 0.1" header; attach a cut
+# link cable as a pigtail. METER IT FIRST - the two ends of a link cable are
+# deliberately cross-wired, and reversed SI/SO is a top failure mode.
 # ===========================================================================
 add_comp("J1", "GB-LINK", FP_LINK, "")
 n("LINK_VCC",("J1",1)); n("LINK_SO",("J1",2)); n("LINK_SI",("J1",3))
 n("LINK_SD",("J1",4));  n("LINK_SC",("J1",5)); n("GND",("J1",6))
 
 # ===========================================================================
-# J4  GB EXT socket - OPTIONAL, same nets as J1, populate ONE of the two.
-#   J1 = 0.1" header for a soldered cut-cable pigtail (works today)
+# J4  GB EXT socket - DEFERRED TO REV B, inert. Same nets as J1; populate ONE.
+#   J1 = 0.1" header for a soldered cut-cable pigtail  <- REV A SHIPS THIS
 #   J4 = real EXT socket so a normal link cable plugs in (needs a drawn footprint)
-# Wiring them in parallel costs nothing on a bare board and lets one fabrication
-# run serve either approach. Pin 1 (VCC) and pin 4 (SD) stay unconnected on both:
-# the board is USB-C self-powered, and stock cables only carry 4 of the 6 pins.
+# Pin 1 (VCC) and pin 4 (SD) stay unconnected on both: the board is USB-C
+# self-powered, and stock cables only carry 4 of the 6 pins.
 # ===========================================================================
 if EMIT_LINK_SOCKET:
     add_comp("J4", "GB-LINK-SKT", FP_LINK_SOCKET, "")

@@ -171,25 +171,44 @@ four-lead pattern, replace it (e.g. Omron B3F-1000/B3F-1002 or equivalent) in
 
 ### 4. Which link connector?
 
-> ### ✅ Decision (2026-07-28): land **J1 + J4**. **J5 is parked.**
+> ### ✅ **FINAL for rev A (2026-07-28): ship J1 only. J4 and J5 are both deferred.**
 >
-> J1 and J4 both mount on the board face and change nothing about the outline,
-> plating or thickness — landing both costs nothing and lets one fab run serve
-> either a soldered pigtail or an ordinary link cable.
+> **This is what the board already is** — `EMIT_LINK_SOCKET` and `EMIT_LINK_EDGE`
+> are both `False`, so J4 and J5 have never appeared in any netlist or board. The
+> exported gerbers, drill, CPL and BOM in this repo are **correct as they stand and
+> need no re-export** for this decision.
 >
-> **J5 (board-edge tongue) was deliberately dropped for rev A.** It costs no
-> parts, but it forces an outline change, wants ENIG (**~1.5–2.0×** the
-> bare-board line vs HASL) because an inserted edge wears, and — decisively —
-> it plugs the board *rigidly into the console with no cable*, which is wrong
-> for a keyboard you sit and type on. The analysis is kept in
-> `generate_workboy_netlist.py` and below, so revisiting it needs no re-research.
+> **Why J1 only.** J4 is not free in the way it first looked. It costs nothing in
+> *board area*, but it does cost a **footprint that does not exist and cannot be
+> drawn without the physical part in hand** — you must buy an EXT socket, measure
+> it, draw `workboy:GB_EXT_Socket_6P`, re-import, place, route, re-run DRC and
+> re-export. That is the entire remaining critical path for rev A, in service of a
+> connector whose only benefit over J1 is cable convenience. A soldered pigtail
+> works on day one.
+>
+> **Rev A proves the design; rev B can add the socket** once a real board has shown
+> the protocol works end to end — and by then the socket can be measured against a
+> board that exists.
+>
+> **J5 (board-edge tongue) stays parked** for the reasons below: it forces an
+> outline change, wants ENIG (**~1.5–2.0×** the bare-board line vs HASL) because an
+> inserted edge wears, and — decisively — it plugs the board *rigidly into the
+> console with no cable*, which is wrong for a keyboard you sit and type on.
+>
+> The full analysis for both is kept here and in `generate_workboy_netlist.py`, and
+> the netlist support is already written and inert, so revisiting either needs no
+> re-research.
 
-All three land on the **same six nets**; you populate exactly one. Wiring them in
-parallel is electrically free.
+**What this means practically:** populate **J1**, a 1×6 0.1″ header, and attach a
+cut link cable as a pigtail. Meter it first — see the warning at the end of this
+file, reversed SI/SO is a top failure mode.
 
-| | **J1** — 1×6 0.1″ header | **J4** — real EXT socket | **J5** — board-edge tongue |
+All three options land on the **same six nets**; you populate exactly one. Wiring
+them in parallel would be electrically free — the cost is footprint work, not area.
+
+| | **J1** — 1×6 0.1″ header ✅ **rev A** | **J4** — real EXT socket ⏸ rev B | **J5** — board-edge tongue ⏸ parked |
 |---|---|---|---|
-| Status | **ready now** | needs footprint drawn | needs footprint **+ outline** |
+| Status | **shipping — on the board now** | needs footprint drawn | needs footprint **+ outline** |
 | Attaches via | soldered cut-cable pigtail | **any standard link cable** | plugs straight into the console |
 | Part cost | ~$5–8 (cable to cut) | ~$3–10 (repair part) | **$0 — no part** |
 | Board outline | unchanged | unchanged | ⚠️ **changes it** |
@@ -197,8 +216,10 @@ parallel is electrically free.
 | Thickness | any | any | ⚠️ socket is ~1.2 mm nominal; **1.6 mm is tight** |
 | Ergonomics | permanent tail | best — normal cable | rigid, board hangs off the console |
 
-**J1 + J4 are genuinely free** — both mount on the board face, change nothing about
-the outline, plating or thickness. Land both.
+**J4 — deferred to rev B. Notes kept.** It changes nothing about the outline,
+plating or thickness, so it can be added later at no cost to the board. What it
+needs is a **footprint drawn from a physical socket**, which is why it is not in
+rev A.
 
 **J5 — parked. Notes kept for a possible rev B.**
 
@@ -233,22 +254,14 @@ makes insertion much kinder.
 > generator you must import the netlist in the KiCad PCB editor, place and route
 > the new part, re-run DRC, and re-export gerbers + CPL.
 
-> 🔴 **Correction (2026-07-28): the "land J1 + J4" decision above is NOT
-> implemented.** `generate_workboy_netlist.py:55` still has
-> `EMIT_LINK_SOCKET = False`, so the J4 block never emits and **J4 has never
-> existed in any netlist or board** — the board carries J1 only (3 `J` designators:
-> J1, J2, J3).
+> ✅ **Resolved 2026-07-28 — rev A ships J1 only** (see the decision box above).
+> The repo previously recorded a "land J1 + J4" decision it had never carried out;
+> the record now matches the board.
 >
-> The old wording here — that the gerbers "were produced *before* J4 existed" —
-> had the premise backwards. It implied the exports merely needed refreshing. They
-> do not: **the exports are current.** Re-exporting gerbers and drill from the
-> present board reproduces `kicad/gerber/*` byte-for-byte across all 26 files,
-> except the KiCad version string (10.0.3 → 10.0.5) and the timestamp.
->
-> So decide explicitly: either **implement J4** (buy the socket, measure it, draw
-> `workboy:GB_EXT_Socket_6P`, flip the flag, re-import, place, route, re-run DRC,
-> re-export) — or **amend the decision to say rev A ships J1 only** and defer J4.
-> Right now the repo records a decision it has not carried out.
+> For the record, so the old wording is not resurrected: the note that the gerbers
+> "were produced *before* J4 existed" had its premise backwards. It implied the
+> exports needed refreshing. They did not — **J4 never existed at all**, and the
+> exports were already current. The board carries three `J` designators: J1, J2, J3.
 
 ### 5. Board size vs. the cost tier — **worse than written**
 The real board is **152.000 × 106.125 mm** (§2), not the ~140 × 85 mm this section
@@ -306,10 +319,10 @@ from `workboy_jlcpcb_bom.csv` on purpose.
 
 1. ~~Add mounting holes~~ ✅ **done** (§1) — H1–H4, DRC clean, all artefacts
    re-exported.
-2. **Decide J4** (§4 below) — implement it or amend the decision to J1-only. This
-   is now the **only remaining thing that would change the gerbers**.
+2. ~~Decide J4~~ ✅ **done** (§4) — **rev A ships J1 only.** Nothing further to
+   change on the board; the exported artefacts already reflect this.
 3. **Check `C720477`** on LCSC (§4) and fix the BOM if it is not a 6×6 mm THT tact.
-   *(BOM-only — does not affect the board.)*
+   *(BOM-only — does not affect the board or the gerbers.)*
 4. Get a live JLCPCB quote at **152 × 107 mm** (§5).
 5. Order 5. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
    `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless paying
@@ -320,9 +333,13 @@ from `workboy_jlcpcb_bom.csv` on purpose.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
-> If J4 is deferred and `C720477` checks out, **the board is ready to order as it
-> stands** — the exported gerbers, drill, CPL and BOM in the repo are current as of
-> 2026-07-28 and DRC-clean.
+> ### 🟢 **Nothing left that changes the board.**
+> With J4 deferred and the mounting holes in, **the only open item is the
+> `C720477` BOM check** — and that is a BOM edit, not a board change. The gerbers,
+> drill, CPL and STEP in this repo are current as of 2026-07-28 and DRC-clean, so
+> once that part number is confirmed the board can be ordered as it stands.
+>
+> The case remains unfinished, but it is 3D-printed and does not gate the PCB.
 
 > **Meter the cut cable before connecting.** Reversed SI/SO is listed as a top
 > failure mode — the two ends of a link cable are deliberately cross-wired.
@@ -342,7 +359,7 @@ board file directly rather than trusting the documentation. What it changed:
 | Mounting holes | not on the list | ✅ **fixed same day** — 4 added, DRC clean, artefacts re-exported |
 | Board size | ~140 × 85 mm | **152.000 × 106.125 mm**, over the cheap tier on both axes |
 | Gerber staleness | assumed stale | ✅ current, byte-identical |
-| J1 + J4 decision | recorded as decided | 🔴 never implemented |
+| J1 + J4 decision | recorded as decided | ✅ **amended — rev A ships J1 only**, matching what the board always was |
 
 **Not independently cross-checked** (their reviewers failed to run): the switch
 tie-topology reasoning and the C720477 package claim in §4. Both are flagged inline.
