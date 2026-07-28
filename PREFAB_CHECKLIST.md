@@ -214,11 +214,55 @@ Pins*, 2×3 six-pin dual row, 2.54 mm pitch, through-hole, gold-plated, 3 A / 1 
 > the real land patterns, but a part *number* is only as good as the last person who
 > checked it.
 
-#### ⚠️ `C72043` (green LED) reads "Not available now"
+### 4b. 🔍 Full BOM audit — **every line opened on LCSC (2026-07-28)**
 
-LED2/LED3. Not a design problem — any green 0805 LED with the same polarity works,
-and `LED_0805_2012Metric` is a standard land pattern — but pick a stocked
-substitute at order time rather than letting the line fail validation.
+Prompted by two bad part numbers in a row. All 14 lines checked for *identity,
+value, package and availability* — not just existence.
+
+| Line | LCSC | What it actually is | Verdict |
+|---|---|---|---|
+| U1 ATmega328P-AU | `C14877` | Microchip ATMEGA328P-AU · 5,662 stock · $2.14 | ✅ |
+| C1–C4 100nF 0402 | `C1525` | Samsung CL05B104KO5NNNC · 100nF **0402** 16 V X7R · 1.39 M | ✅ |
+| C5,C6 10µF 0805 | `C15850` | Samsung CL21A106KAYNNNE · 10µF **0805** 25 V X5R · 295 k | ✅ |
+| D1–D53 1N4148W | `C2099` | JSCJ 1N4148W **SOD-123** · 32,050 · $0.0124 | ✅ |
+| D54 SS14 | `C2480` | MDD SS14 **SMA** · $0.019 (MOQ 50) | ✅ |
+| J3 USB-C | `C165948` | **Korean Hroparts TYPE-C-31-M-12** · 246,285 · $0.17 | ✅ *(also settles §3)* |
+| SW1–53 tact | `C42416249` | SHOU HAN SH-6X6X8H-CJ · DIP-4P 6×6 · 8,480 | ✅ *(fixed, §4)* |
+| J2 ISP header | `C42431837` | JXTCONN PH2.54-2X3P-H25 · 2×3 male THT · 39,180 | ✅ *(fixed, §4)* |
+| R1–R3 10k 0402 | `C25744` | UNI-ROYAL 0402WGF1002TCE · 10 kΩ 0402 1% — right part | ⚠️ **out of stock** |
+| R4–R6 220R 0402 | `C25091` | UNI-ROYAL 0402WGF2200TCE · 220 Ω 0402 1% — right part | ⚠️ **out of stock** |
+| R7–R9 1k 0402 | `C11702` | UNI-ROYAL 0402WGF1001TCE · 1 kΩ 0402 1% — right part | ⚠️ **out of stock** |
+| R10,R11 5.1k 0402 | `C25905` | UNI-ROYAL 0402WGF5101TCE · 5.1 kΩ 0402 1% — right part | ⚠️ **out of stock** |
+| LED1 red "0805" | ~~`C2286`~~ → **`C2295`** | was KENTO **KT-0603R — 0603**, not 0805 | 🔴 **wrong package — fixed** |
+| LED2,3 green "0805" | ~~`C72043`~~ → **`C2297`** | was EVERLIGHT 19-217 — **0603** *and* unavailable | 🔴 **wrong package — fixed** |
+
+#### 🔴 Both LEDs were the wrong package
+
+`C2286` and `C72043` are **0603** parts, but the board has **0805** land patterns
+(`LED_SMD:LED_0805_2012Metric`). A 0603 body hand-solders onto 0805 pads, but in
+reflow it risks tombstoning and misplacement — pick-and-place positions to the
+part's own body, not the pad.
+
+Replaced with the same manufacturer's genuine 0805 parts, both well stocked:
+**`C2295` KT-0805R** (red, 101,200) and **`C2297` KT-0805G** (green, 1,996,800).
+
+#### ⚠️ All four 0402 resistors are out of stock
+
+Right value, right package, right tolerance — but the UNI-ROYAL `0402WGF*TCE`
+series is **out of stock at LCSC and absent from JLCPCB's assembly library**
+(searched `0402WGF1002TCE` — no results). LCSC's alternates are third-party
+listings with 60,000-piece minimums and 9–14 day lead times.
+
+**This is a shopping problem, not a design problem.** 0402 chip resistors are the
+most commoditised parts that exist; any 10k/220R/1k/5.1k 0402 works and the board
+does not change. **Substitute at order time, choosing from JLCPCB's *Basic* parts
+library** — Basic parts avoid the ~$3-per-unique-part extended fee, and passive
+stock churns weekly so pinning an MPN now would just go stale again.
+
+> **Tally: 4 of 14 lines named a part that could not be fitted** (2 outright wrong
+> parts, 2 wrong package), and 4 more name parts you cannot currently buy. The
+> footprints were all verified against real land patterns — it was the *part
+> numbers* that were unreviewed. Worth remembering for any future BOM here.
 
 > Cheap physical settle: put a DMM across one switch before soldering 53. The legs
 > **6.5 mm** apart must beep **unpressed**; the legs **4.5 mm** apart must be open
@@ -360,7 +404,7 @@ Five blank boards. Components are a separate LCSC order. Prices checked 2026-07-
 | USB-C receptacle | C165948 | 1 | $0.1709 | $0.17 |
 | SS14 Schottky | C2480 | 1 | $0.019 | $0.02 |
 | ISP header | C42431837 | 1 | $0.0293 | $0.03 |
-| LEDs ×3 | C2286 / C72043 | 3 | ~$0.03 | $0.09 |
+| LEDs ×3 | C2295 / C2297 | 3 | ~$0.014 | $0.04 |
 | Passives (6 caps, 11 resistors) | — | 17 | ~$0.005 | $0.09 |
 | | | | **≈ $3.86/board** | |
 
@@ -493,11 +537,16 @@ coordinates** rather than hard-coded ones.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
-> ### 🟢 **Ready to order — nothing outstanding.**
-> Every blocker is closed: mounting holes added, J3 moved to the edge, J4 deferred
-> to rev B, the switch part number corrected, and the board quoted. The gerbers,
-> drill, CPL, BOM and STEP in this repo are current as of 2026-07-28 and DRC-clean
-> (**0 violations, 0 unconnected, 0 footprint errors**).
+> ### 🟢 **The BOARD is ready to order.**
+> Every board-level blocker is closed: mounting holes added, J3 moved to the edge,
+> J4 deferred to rev B. The gerbers, drill, CPL and STEP are current as of
+> 2026-07-28 and DRC-clean (**0 violations, 0 unconnected, 0 footprint errors**).
+>
+> ⚠️ **The BOM needs one shopping pass before you buy.** All 14 lines were audited
+> (§4b): four named parts that could not be fitted — now corrected — and **the four
+> 0402 resistor lines name parts that are currently unbuyable**. Swap them for any
+> in-stock 0402 of the same value, ideally from JLCPCB's *Basic* library. No board
+> change; the footprints are verified.
 >
 > **Cost (§5): PCBs $11.80 + components ≈ $19–20 + shipping ≈ $28 → roughly
 > $60–85 for five boards**, i.e. **$12–17 per assembled board**, self-assembled.

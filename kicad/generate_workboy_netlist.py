@@ -137,9 +137,13 @@ add_comp("R11","5.1k", FP_R, "C25905"); n("USB_CC2", ("R11",1)); n("GND", ("R11"
 # ===========================================================================
 # LEDs (pad1=K -> GND, pad2=A -> resistor)
 # ===========================================================================
-add_comp("LED1", "RED",   FP_LED, "C2286");  n("GND", ("LED1",1)); n("LED1_A", ("LED1",2))
-add_comp("LED2", "GREEN", FP_LED, "C72043"); n("GND", ("LED2",1)); n("LED2_A", ("LED2",2))
-add_comp("LED3", "GREEN", FP_LED, "C72043"); n("GND", ("LED3",1)); n("LED3_A", ("LED3",2))
+# C2295 = Hubei KENTO KT-0805R, C2297 = KT-0805G. Both are genuinely 0805, matching
+# FP_LED. They replaced C2286 and C72043, which are 0603 parts - a 0603 body on an
+# 0805 land pattern hand-solders but risks tombstoning/misplacement in reflow.
+# C72043 was also unavailable.
+add_comp("LED1", "RED",   FP_LED, "C2295"); n("GND", ("LED1",1)); n("LED1_A", ("LED1",2))
+add_comp("LED2", "GREEN", FP_LED, "C2297"); n("GND", ("LED2",1)); n("LED2_A", ("LED2",2))
+add_comp("LED3", "GREEN", FP_LED, "C2297"); n("GND", ("LED3",1)); n("LED3_A", ("LED3",2))
 
 # ===========================================================================
 # D54  SS14 Schottky:  VBUS(anode,pad2) -> +5V(cathode,pad1)
