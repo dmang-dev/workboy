@@ -68,7 +68,7 @@ def parse_board(path):
     if not xs:
         raise SystemExit("could not parse Edge.Cuts from " + path)
 
-    holes, switches = {}, {}
+    holes, switches, conns = {}, {}, {}
     for blk in _blocks(txt, "(footprint "):
         ref = re.search(r'\(property "Reference" "([^"]+)"', blk)
         at = re.search(r"\(at ([-\d.]+) ([-\d.]+)", blk)
@@ -79,12 +79,14 @@ def parse_board(path):
             holes[r] = (x, y)
         elif re.fullmatch(r"SW\d+", r):
             switches[r] = (x, y)
+        elif re.fullmatch(r"J\d+", r):
+            conns[r] = (x, y)
 
     return dict(
         x0=min(xs), x1=max(xs), y0=min(ys), y1=max(ys),
         w=max(xs) - min(xs), d=max(ys) - min(ys),
         cx=(min(xs) + max(xs)) / 2.0, cy=(min(ys) + max(ys)) / 2.0,
-        holes=holes, switches=switches,
+        holes=holes, switches=switches, conns=conns,
     )
 
 
@@ -116,6 +118,12 @@ KEY_DX, KEY_DY = to_case((min(sw_x) + max(sw_x)) / 2.0, (min(sw_y) + max(sw_y)) 
 # pitch used to generate the cutouts or the holes will not line up with the caps.
 _ux = sorted({round(v, 3) for v in sw_x})
 PITCH_MEASURED = round(min(b - a for a, b in zip(_ux, _ux[1:])), 3)
+
+# Connector openings are cut where the connectors actually are.
+_j1 = B["conns"].get("J1")
+_j3 = B["conns"].get("J3")
+J1_X = to_case(*_j1)[0] if _j1 else 0.0
+J3_Y = to_case(*_j3)[1] if _j3 else 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -207,12 +215,14 @@ with BuildPart() as bottom:
             Circle(INSERT_D / 2)
     extrude(amount=6.1, mode=Mode.SUBTRACT)
 
-    # Cable exits. Both connectors sit INLAND (see the note printed at the end),
-    # so these are wire/pigtail exits, not plug-through ports.
-    with Locations((-8.3, -CASE_D / 2 + WALL / 2, FLOOR_TH + STANDOFF_H + 4)):
+    # Openings, positioned from the real connector coordinates rather than by eye.
+    #   J3 (USB-C) is mounted flush with the RIGHT board edge, so this is a true
+    #   plug-through port. J1 (link) is a soldered pigtail ~9.5 mm inboard of the
+    #   front edge, so that one stays a wire exit.
+    with Locations((J1_X, -CASE_D / 2 + WALL / 2, FLOOR_TH + STANDOFF_H + 4)):
         Box(16, WALL * 3, 9, mode=Mode.SUBTRACT)                       # J1 link pigtail
-    with Locations((CASE_W / 2 - WALL / 2, -25.1, FLOOR_TH + STANDOFF_H + 4)):
-        Box(WALL * 3, 14, 9, mode=Mode.SUBTRACT)                       # J3 USB-C tail
+    with Locations((CASE_W / 2 - WALL / 2, J3_Y, FLOOR_TH + STANDOFF_H + 3)):
+        Box(WALL * 3, 13, 8, mode=Mode.SUBTRACT)                       # J3 USB-C port
 
 # ---------------------------------------------------------------------------
 # Top plate - key cutouts at the real switch positions
@@ -270,6 +280,8 @@ print(f"         {INNER_W:.3f} x {INNER_D:.3f} mm interior ({CLEAR} mm clearance
 print(f"key    : pitch {PITCH} mm measured from the board; field offset "
       f"({KEY_DX:+.4f}, {KEY_DY:+.4f}) from the board centre")
 print(f"mounts : {len(stands)} at " + ", ".join(f"({x:+.3f},{y:+.3f})" for x, y in sorted(stands)))
+print(f"ports  : J1 pigtail slot at x={J1_X:+.3f} on the front wall; "
+      f"J3 USB-C port at y={J3_Y:+.3f} on the right wall")
 for n in note:
     print("  NOTE:", n)
 print("exported: workboy_top.stl, workboy_bottom.stl, workboy_case_assembly.step")

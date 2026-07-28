@@ -27,7 +27,10 @@ python ..\layout\gen_layout.py
 & "$K\python.exe" gen_pcb.py
 # 3. export DSN, autoroute, import back
 & "$K\python.exe" -c "import pcbnew; b=pcbnew.LoadBoard('workboy.kicad_pcb'); pcbnew.ExportSpecctraDSN(b,'workboy.dsn')"
-java -jar ..\tools\freerouting-1.9.0.jar -de workboy.dsn -do workboy.ses -mp 8   # Java 21
+# Freerouting 2.2.4 needs Java 25 (class file 69); 1.9.0 still runs on Java 17.
+& "$env:ProgramFiles\Eclipse Adoptium\jdk-25.0.4.7-hotspot\bin\java.exe" `
+    -Djava.awt.headless=true -jar ..\tools\freerouting.jar `
+    -de workboy.dsn -do workboy.ses -mp 20
 & "$K\python.exe" apply_ses.py
 # 4. fab outputs
 & "$K\kicad-cli.exe" pcb export gerbers -o gerber workboy.kicad_pcb
@@ -44,12 +47,39 @@ python make_cpl.py
    from assembly. Re-verify the **J3 USB-C** footprint vs the real C165948 part.
 
 ## Status: DRC-CLEAN ✅
-`kicad-cli pcb drc` reports **0 violations, 0 unconnected** on the routed board
-(2-layer, ~152 × 106 mm, ~971 track/via objects). Diodes sit in the inter-row gap
-(clear of the switch courtyards); support parts are grouped by net so the routes
-stay local. Design rules: 0.25 mm tracks, **0.15 mm clearance** (JLCPCB 6-mil
+`kicad-cli pcb drc --severity-all` reports **0 violations, 0 unconnected, 0 footprint
+errors** on the routed board (2-layer, **152.000 × 106.125 mm**, 135 footprints,
+1011 track/via objects). Diodes sit in the inter-row gap (clear of the switch
+courtyards). Design rules: 0.25 mm tracks, **0.15 mm clearance** (JLCPCB 6-mil
 standard), 0.6/0.3 mm vias. The Gerbers in `gerber/` (zipped as
 `workboy_gerbers.zip`) are ready to fab.
+
+### Placement notes (2026-07-28)
+- **The outline is pinned**, not derived. It used to be the bounding box of every
+  placed part + 10 mm, so moving one component silently resized the board — and the
+  size is load-bearing for the case, the mounting holes and the quote. `BX0..BY1` in
+  `gen_pcb.py` fix it; placement is asserted to fit inside and the script refuses to
+  write a board that overflows.
+- **J3 is placed explicitly, flush with the right edge** (rot 90, mating face
+  outward) so a USB-C plug can reach it. It previously landed wherever the
+  support-part flow put it, ~16 mm inside the outline.
+- **R10/R11/D54 are placed explicitly beside J3.** The row-wrapping flow used to
+  strand R11 and D54 ~130 mm away, dragging VBUS across the whole board; that run is
+  now 13.7 mm.
+- **H1–H4 mounting holes** are placed at a 4.0 mm corner inset, excluded from the BOM
+  and position file, with their reference labels on `F.Fab` (at 4 mm the silkscreen
+  text is clipped by the outline and trips `silk_edge_clearance`).
+
+> ⚠️ **`gen_pcb.py` ordering is load-bearing.** Mutating footprints
+> (`Remove`/`SetAttributes`) invalidates KiCad 10's SWIG proxies, so every such call
+> must come *after* the last `FootprintLoad` **and** after the `fp.Pads()`
+> net-assignment loop. Doing it earlier fails with `'SwigPyObject' object has no
+> attribute 'FootprintLoad'` or `'SwigPyObject' object is not iterable`.
+
+> ⚠️ **Export the DSN from an *unrouted* board.** `gen_pcb.py` writes a placed,
+> unrouted board; exporting a DSN from an already-routed one makes Freerouting
+> re-route on top of existing copper and leave nets unrouted. Assert
+> `len(board.GetTracks()) == 0` before exporting.
 
 ## Before ordering — quick sanity
 - **J3 USB-C is the real C165948** — Korean Hroparts `TYPE-C-31-M-12`, official KiCad

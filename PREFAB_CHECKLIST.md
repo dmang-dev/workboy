@@ -312,34 +312,45 @@ quoted in `BUILD_PLAN`; the 53 switches sit on an exact 12.0 mm grid spanning
 Either way the **link connector is consigned or hand-soldered** — it is excluded
 from `workboy_jlcpcb_bom.csv` on purpose.
 
-### 7. ⚠️ The connectors sit **inland**, so nothing plugs in through a wall
+### 7. ~~The connectors sit inland~~ ✅ **RESOLVED 2026-07-28 — J3 moved to the right edge**
 
-Found while re-fitting the case. Measured from the board, distance from the part's
-own bounding box to the nearest board edge:
+*Was: J3 sat **16.07 mm inside** the outline, so no USB-C plug could reach it —
+you would have needed a 16 mm channel through the case wall.*
 
-| | Position (case frame) | Nearest edge | Gap |
-|---|---|---|---|
-| **J3 USB-C** | X +49.24…+59.93, Y −29.87…−20.40 | +X (right) | **16.07 mm** |
-| J2 ISP | X +10.63…+16.78, Y −32.17…−23.50 | −Y (front) | 20.89 mm |
-| J1 link | X −10.12…−6.53, Y −43.60…−27.31 | −Y (front) | 9.47 mm |
+J3 is now **flush with the right edge**, rotated 90° so the mating face points
+outward, body front on the outline and the courtyard overhanging by 0.525 mm (normal
+for an edge-mounted connector). It is a real plug-through port.
 
-**J3 is the problem.** A USB-C plug cannot reach a socket 16 mm inside the board
-outline — you would need a 16 mm channel through the wall. J1 and J2 are fine:
-J1 is a soldered pigtail (a wire exit, not a plug) and J2 is a programming header
-used once with the lid off.
+| | Before | After |
+|---|---|---|
+| J3 → right edge | 16.07 mm inland | **−0.525 mm (overhangs)** |
+| R11 (CC2 pulldown) → J3 | 138.31 mm | **9.37 mm** |
+| D54 (VBUS Schottky) → J3 | 131.51 mm | **12.35 mm** |
+| Total VBUS copper | ~112 mm across the board | **13.7 mm** |
 
-This does **not** block the PCB order — the board is electrically correct either
-way. It is a choice about how rev A gets powered:
+The support cluster moved with it, which fixed a second latent problem. `gen_pcb.py`
+placed support parts with a **row-wrapping flow**, and the `["J3","R10","R11","D54"]`
+group happened to straddle a wrap — stranding the CC2 pulldown and the VBUS diode on
+the far side of the PCB and dragging the unfused power input across the whole board.
+That was an artifact of the layout algorithm, not a decision. The cluster is now
+placed explicitly.
 
-- **Ship rev A as-is** and run a short internal USB-C pigtail from J3 to a
-  panel-mount socket in the wall. The case has a tail slot for it. Costs one extra
-  part, no board change.
-- **Move J3 to the right board edge before ordering.** The correct fix, but it means
-  re-placing, re-routing, re-running DRC and re-exporting — and it reopens a board
-  that is currently clean. Sensible only if you would rather not have a pigtail.
+**J1 and J2 were never a problem** and are unchanged: J1 (9.47 mm in) is a soldered
+pigtail — a wire exit, not a plug — and J2 is a programming header used once with the
+lid off.
 
-The current case assumes the first option. Both cable exits are sized as **wire
-exits**, not plug-through ports.
+**Verified after the move:** DRC **0 violations, 0 unconnected, 0 footprint errors**;
+board outline unchanged at 152.000 × 106.125 mm; 135 footprints, 1011 track/via
+objects; drill still carries 4× `T6C2.700`; CPL still 131 parts. Case regenerates
+identically and now cuts its **J3 port and J1 slot from the real connector
+coordinates** rather than hard-coded ones.
+
+> The board outline is now **pinned** in `gen_pcb.py` (`BX0..BY1`) instead of being
+> derived from the bounding box of whatever happens to be placed. Deriving it meant
+> moving any single part could silently resize the board — and the size is
+> load-bearing for the case, the mounting holes and the quote. The placement is
+> asserted to fit inside it instead, and the script refuses to write a board that
+> overflows.
 
 ---
 
@@ -388,12 +399,14 @@ exits**, not plug-through ports.
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
 > ### 🟢 **Nothing left that changes the board.**
-> With J4 deferred and the mounting holes in, **the only open item is the
-> `C720477` BOM check** — and that is a BOM edit, not a board change. The gerbers,
-> drill, CPL and STEP in this repo are current as of 2026-07-28 and DRC-clean, so
-> once that part number is confirmed the board can be ordered as it stands.
+> With J4 deferred, the mounting holes in and J3 moved to the edge, **the only open
+> item is the `C720477` BOM check** — and that is a BOM edit, not a board change.
+> The gerbers, drill, CPL and STEP in this repo are current as of 2026-07-28 and
+> DRC-clean, so once that part number is confirmed the board can be ordered as it
+> stands.
 >
-> The case remains unfinished, but it is 3D-printed and does not gate the PCB.
+> The case is rebuilt from the board file and fits, so it no longer gates anything
+> either.
 
 > **Meter the cut cable before connecting.** Reversed SI/SO is listed as a top
 > failure mode — the two ends of a link cable are deliberately cross-wired.
