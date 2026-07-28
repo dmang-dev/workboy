@@ -100,8 +100,12 @@ need a manual check:
 - **J1 GB EXT link connector:** there is **no catalog part**. The placeholder is a
   1×6 2.54 mm header for a cut-cable pigtail. Swap for your chosen breakout/edge
   footprint. Consign it or hand-solder — it's excluded from the JLCPCB BOM.
-- **SW (C720477) / tact 6 mm:** confirm the chosen footprint's pad numbering is
-  1/2 (some 4-leg tacts net-tie pad pairs — KiCad handles it, just verify).
+- **SW (C42416249) / tact 6×6 mm THT:** ✅ verified 2026-07-28. `SW_PUSH_6mm` in
+  KiCad 10 uses duplicated pad numbers (`1,1,2,2`); the tie spans **6.5 mm** and the
+  switch closes across the **4.5 mm** gap, so netlist pads 1/2 really are across the
+  contacts. The part's lead pattern is 6.5 × 4.5 mm — it matches.
+  ⚠️ Was `C720477`, which is an **SMD 4×3 mm 2-terminal** part and could never have
+  fitted this footprint.
 
 ---
 

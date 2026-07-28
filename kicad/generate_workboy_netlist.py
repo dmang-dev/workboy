@@ -230,7 +230,10 @@ for r in range(ROWS):
             continue
         k += 1
         sw, di = f"SW{k}", f"D{k}"
-        add_comp(sw, "TACT_6mm", FP_SW, "C720477")
+        # C42416249 = SHOU HAN SH-6X6X8H-CJ, DIP-4P 6x6mm THT, lead pattern
+        # 6.5 x 4.5 mm - matches FP_SW exactly. It replaced C720477, which was
+        # an SMD 4x3mm 2-terminal part and could never have fitted this footprint.
+        add_comp(sw, "TACT_6mm", FP_SW, "C42416249")
         add_comp(di, "1N4148W",  FP_DIODE, "C2099")
         n(f"ROW{r}", (sw, 1))
         n(f"KEY{k}",  (sw, 2), (di, 1))   # switch <-> diode cathode

@@ -201,7 +201,7 @@ The assembly-ready file is [`workboy_jlcpcb_bom.csv`](workboy_jlcpcb_bom.csv)
 | Power LED | Red | 0805 | C2286 | Basic | 1 |
 | CAPS/NUM LEDs | Green | 0805 | C72043 | Ext-Preferred | 2 |
 | USB-C power | TYPE-C 16P | SMD | C165948 | Ext-Preferred | 1 |
-| **Tactile switch (THT)** | 6×6 mm tact | TH | C720477 | Ext-THT | 53 |
+| **Tactile switch (THT)** | 6×6×8 mm tact, 4-leg (SH-6X6X8H-CJ) | TH | C42416249 | Ext-THT | 53 |
 | ISP header (THT) | 2×3 2.54 mm | TH | C2718 | Ext-THT | 1 |
 | **Link connector** | GB EXT — **consign / cut cable** | — | none | Consign | 1 |
 

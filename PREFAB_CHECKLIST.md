@@ -174,15 +174,29 @@ Every footprint also carries `(duplicate_pad_numbers_are_jumpers no)`, so KiCad
 required real copper between each tied pair rather than trusting the leadframe —
 and that copper is present. A single bad solder joint per pair will not kill a key.
 
-🔴 **But the ordered part does not match the footprint.** The BOM specifies
-**`C720477`** for all 53 switches with comment *"Tactile switch 6x6mm THT"* and
-footprint `SW-TH-6.0x6.0` — while the investigation reports C720477 is actually an
-**SMD 4×3 mm** tact. I could not confirm that from here (it is a vendor fact), so:
+✅ **BOM part corrected 2026-07-28 — `C720477` was indeed the wrong part.**
 
-**Open [lcsc.com/product-detail/C720477.html](https://www.lcsc.com/product-detail/C720477.html)
-and check the package.** If it is not a 6×6 mm THT part on the B3F 6.5 × 4.5 mm
-four-lead pattern, replace it (e.g. Omron B3F-1000/B3F-1002 or equivalent) in
-`workboy_jlcpcb_bom.csv` and anywhere else it appears.
+Checked on LCSC: **`C720477` is XUNPU `TS-1088-AR02016`, package "SMD,4x3mm",
+surface mount, 2 terminals.** Wrong size, wrong mount type, wrong terminal count —
+all 53 switches were specified as a part that cannot be fitted to this footprint.
+
+Replaced with **`C42416249` — SHOU HAN `SH-6X6X8H-CJ`**:
+
+| | |
+|---|---|
+| Package | **`DIP-4P,6x6mm`** — through-hole, 4 legs |
+| **Lead spacing** | **6.5 × 4.5 mm** — matches `SW_PUSH_6mm` exactly |
+| Body / height | 6 × 6 mm, 8 mm actuator |
+| Life | 100,000 cycles · SPST · 50 mA · 12 V |
+| Stock / price | 8,480 · ~$0.0124 ea @ 20+ (≈ **$1.30 for 100**) |
+
+8 mm was chosen because the case already models the switch ~8.5 mm above the PCB.
+**The whole SH-6X6X\*H-CJ family shares the identical 6.5 × 4.5 mm footprint** at
+4.3 / 5.5 / 6.5 / 8 / 9 mm, so the actuator height can be re-picked when the keycaps
+are designed **without touching the board** — only the BOM line changes.
+
+> The `Footprint` column was also wrong (`SW-TH-6.0x6.0`, a name matching nothing);
+> it now carries LCSC's own `DIP-4P,6x6mm` string.
 
 > Cheap physical settle: put a DMM across one switch before soldering 53. The legs
 > **6.5 mm** apart must beep **unpressed**; the legs **4.5 mm** apart must be open
@@ -387,8 +401,8 @@ coordinates** rather than hard-coded ones.
    re-exported.
 2. ~~Decide J4~~ ✅ **done** (§4) — **rev A ships J1 only.** Nothing further to
    change on the board; the exported artefacts already reflect this.
-3. **Check `C720477`** on LCSC (§4) and fix the BOM if it is not a 6×6 mm THT tact.
-   *(BOM-only — does not affect the board or the gerbers.)*
+3. ~~Check `C720477`~~ ✅ **done** (§4) — it was an SMD 4×3 mm part; the BOM now
+   specifies **`C42416249`**, a real 6×6 mm THT tact on the matching footprint.
 4. Get a live JLCPCB quote at **152 × 107 mm** (§5).
 5. Order 5. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
    `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless paying
@@ -398,15 +412,21 @@ coordinates** rather than hard-coded ones.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
-> ### 🟢 **Nothing left that changes the board.**
-> With J4 deferred, the mounting holes in and J3 moved to the edge, **the only open
-> item is the `C720477` BOM check** — and that is a BOM edit, not a board change.
-> The gerbers, drill, CPL and STEP in this repo are current as of 2026-07-28 and
-> DRC-clean, so once that part number is confirmed the board can be ordered as it
-> stands.
+> ### 🟢 **Ready to order.**
+> Every blocker is closed: mounting holes added, J3 moved to the edge, J4 deferred
+> to rev B, and the switch part number corrected. The gerbers, drill, CPL, BOM and
+> STEP in this repo are current as of 2026-07-28 and DRC-clean
+> (**0 violations, 0 unconnected, 0 footprint errors**).
 >
-> The case is rebuilt from the board file and fits, so it no longer gates anything
-> either.
+> **The one thing left is a live JLCPCB quote at 152 × 107 mm** (§5) — a price
+> check, not an engineering task.
+>
+> The case is rebuilt from the board file and fits, so it gates nothing either.
+>
+> Two vendor facts still rest on LCSC's catalogue rather than a datasheet you have
+> read: that **C165948** really is the HRO `TYPE-C-31-M-12` (§3), and the exact
+> actuator feel of **C42416249** (§4). Neither can break the board — the footprints
+> are verified against the real land patterns — but glance at both before buying.
 
 > **Meter the cut cable before connecting.** Reversed SI/SO is listed as a top
 > failure mode — the two ends of a link cable are deliberately cross-wired.
@@ -428,8 +448,11 @@ board file directly rather than trusting the documentation. What it changed:
 | Gerber staleness | assumed stale | ✅ current, byte-identical |
 | J1 + J4 decision | recorded as decided | ✅ **amended — rev A ships J1 only**, matching what the board always was |
 
-**Not independently cross-checked** (their reviewers failed to run): the switch
-tie-topology reasoning and the C720477 package claim in §4. Both are flagged inline.
+**Since confirmed on LCSC:** the `C720477` claim was correct — it is XUNPU
+`TS-1088-AR02016`, "SMD,4x3mm", 2 terminals. The BOM now specifies **`C42416249`**
+(SHOU HAN `SH-6X6X8H-CJ`), whose 6.5 × 4.5 mm lead pattern matches `SW_PUSH_6mm`.
 
-**Cannot be settled from these files at all** — vendor-catalogue facts needing a
-datasheet: the identity of **C165948** and the package of **C720477**.
+**Still resting on the vendor catalogue rather than a datasheet you have read:**
+that **C165948** is the HRO `TYPE-C-31-M-12`. The footprint is verified against the
+real KiCad land pattern either way, so this cannot break the board — but it is worth
+a glance before buying.
