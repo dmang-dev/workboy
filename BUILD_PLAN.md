@@ -170,9 +170,12 @@ or more I/O, drop a status LED or a key row, or add an I²C port expander.
   to match the original's footprint; PCB tucks under the top plate.
   ⚠️ **Over JLCPCB's ≤100 × 100 mm bracket on both axes** — the cheap price tier in
   §Cost does not apply. See `PREFAB_CHECKLIST.md` §5.
-- ⚠️ **4× M2.5 corner mounts are specified here but are NOT on the board** — it
-  currently has zero mounting holes. Blocking; see `PREFAB_CHECKLIST.md` §1.
-  (+1 center boss if the plate spans >120 mm.)
+- **4× M2.5 corner mounts** — ✅ placed 2026-07-28 as H1–H4, plain NPTH
+  `MountingHole_2.7mm_M2.5`, 4.0 mm inset from each corner:
+  **(78.000, 40.000) · (222.000, 40.000) · (78.000, 138.125) · (222.000, 138.125)**,
+  i.e. **144.000 × 98.125 mm** spacing, symmetric about the board centre
+  (150.0, 89.0625). DRC clean. *(No centre boss: the right-hand border is only
+  2.05 mm wide, so there is no room for a fifth hole mid-span.)*
 - **Design-for-assembly:** all SMT (U1, passives, 53 diodes, LEDs, USB-C) on the
   **top side only** → one reflow pass → JLCPCB **Economic** single-sided placement.
   Only THT parts = 53 tact switches + ISP header + link connector.

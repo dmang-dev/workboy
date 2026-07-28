@@ -23,20 +23,53 @@ a board if you skip it.
 
 ## 🔴 Blocking — fix before uploading gerbers
 
-### 1. The board has **no mounting holes at all** 🔴 NEW
-*Verified directly: `grep -c MountingHole kicad/workboy.kicad_pcb` → **0**. The only
-two `np_thru_hole` pads are the USB-C connector's alignment posts.*
+### 1. ~~The board has no mounting holes at all~~ ✅ **RESOLVED 2026-07-28 — four added**
 
-`BUILD_PLAN` promises 4× M2.5 and the case drills four standoffs, but the board has
-none. The placeholder's holes at (±61, ±28.5) are **fictional** — they describe a
-board that does not exist.
+*Was: `grep -c MountingHole` → 0, while `BUILD_PLAN` promised 4× M2.5 and the case
+drilled four standoffs. The placeholder's holes at (±61, ±28.5) were fictional.*
 
-This is blocking because **adding holes changes the gerbers**, so it must happen
-before the order, not after.
+Four `MountingHole:MountingHole_2.7mm_M2.5` (**plain NPTH, no copper**) are now
+placed, 4.0 mm inset from the `Edge.Cuts` centreline at each corner, symmetric
+about the board centre **(150.0, 89.0625)**:
 
-Either add four holes in KiCad inside the real outline (keeping ≥0.3 mm
-copper-to-edge per the project's own rule) and re-export, **or** consciously decide
-the board just rests on posts and fix `BUILD_PLAN`/the case to match.
+| Ref | Corner | Position (mm) |
+|---|---|---|
+| **H1** | top-left | **(78.000, 40.000)** |
+| **H2** | top-right | **(222.000, 40.000)** |
+| **H3** | bottom-left | **(78.000, 138.125)** |
+| **H4** | bottom-right | **(222.000, 138.125)** |
+
+**Hole spacing: 144.000 × 98.125 mm** — these are the numbers the case standoffs
+must use.
+
+Positions were chosen by scanning clearances against every pad, track, via and part
+body. Insets of 4.0–5.5 mm all pass; **6.0 mm fails** because the top-right hole
+starts fouling **SW12**. 4.0 mm was taken as it maximises component clearance at
+that tightest corner:
+
+| | copper clr | part-body clr | edge clr |
+|---|---|---|---|
+| H1 | 7.071 mm (SW1) | 6.329 mm | 4.000 mm |
+| **H2** | **4.607 mm (SW12)** | **4.475 mm** ← tightest | 4.000 mm |
+| H3 | 9.318 mm (R11) | 9.071 mm | 4.000 mm |
+| H4 | 24.934 mm (J3) | 22.674 mm | 4.000 mm |
+
+A 5 mm case post needs 2.5 mm of body clearance, so the worst case leaves **1.98 mm
+of margin**. Hole edge sits 2.65 mm from the board edge.
+
+**Verified after the change:**
+- `kicad-cli pcb drc --severity-all --exit-code-violations` → **0 violations, 0
+  unconnected, 0 footprint errors**, exit 0
+- Board outline **unchanged** (73.925–226.075 × 35.925–142.200 incl. stroke)
+- Drill file carries tool **`T6C2.700` with exactly 4 hits** at those coordinates
+- Holes are marked exclude-from-BOM and exclude-from-position-files, so the **CPL
+  still lists 131 parts** and `workboy_jlcpcb_bom.csv` is byte-unchanged
+- H1–H4 added to `generate_workboy_netlist.py` (135 components, zero net nodes) so
+  a future netlist re-import **cannot silently delete them**
+
+> ⚠️ The right-hand edge only has **2.05 mm** of free border (J3 runs close to it) —
+> there is no room for a fifth hole mid-span on that side. The corners are the only
+> viable positions.
 
 ### 2. The real board is **152.000 × 106.125 mm** — the case is sized for 144 × 78 🔴
 *Verified directly from `Edge.Cuts` (4 `gr_line` segments): X 74.0–226.0,
@@ -271,19 +304,25 @@ from `workboy_jlcpcb_bom.csv` on purpose.
 
 **Mechanical first — everything that changes copper must happen before the order.**
 
-1. **Add mounting holes** (§1) — or decide formally that there are none. Changes
-   the gerbers.
-2. **Decide J4** (§4 below) — implement it or amend the decision to J1-only. Also
-   changes the gerbers if adopted.
+1. ~~Add mounting holes~~ ✅ **done** (§1) — H1–H4, DRC clean, all artefacts
+   re-exported.
+2. **Decide J4** (§4 below) — implement it or amend the decision to J1-only. This
+   is now the **only remaining thing that would change the gerbers**.
 3. **Check `C720477`** on LCSC (§4) and fix the BOM if it is not a 6×6 mm THT tact.
-4. Re-run DRC. Re-export gerbers, drill, CPL, and re-zip. *(Expect version-string
-   churn: the committed exports were made with KiCad 10.0.3, the CLI is now 10.0.5.)*
-5. Get a live JLCPCB quote at **152 × 107 mm** (§5).
-6. Order 5. Hand-solder switches + connector unless paying for THT.
-7. **Case is a separate track** — it does not gate the PCB order. Re-derive it from
-   the real outline (§2) before printing anything.
-8. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
+   *(BOM-only — does not affect the board.)*
+4. Get a live JLCPCB quote at **152 × 107 mm** (§5).
+5. Order 5. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
+   `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless paying
+   for THT.
+6. **Case is a separate track** — it does not gate the PCB order. Re-derive it from
+   the real outline (§2); the standoffs now have real hole positions to hit,
+   **144.000 × 98.125 mm** apart.
+7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
+
+> If J4 is deferred and `C720477` checks out, **the board is ready to order as it
+> stands** — the exported gerbers, drill, CPL and BOM in the repo are current as of
+> 2026-07-28 and DRC-clean.
 
 > **Meter the cut cable before connecting.** Reversed SI/SO is listed as a top
 > failure mode — the two ends of a link cable are deliberately cross-wired.
@@ -300,7 +339,7 @@ board file directly rather than trusting the documentation. What it changed:
 | J3 USB-C pads | blocking | ✅ resolved — premise was factually wrong |
 | Switch pad numbering | blocking | ✅ resolved — but exposed a wrong BOM part |
 | Case fit | blocking | 🔴 still blocking, and **worse** — and the placeholder never fit either |
-| Mounting holes | not on the list | 🔴 **blocking — there are none** |
+| Mounting holes | not on the list | ✅ **fixed same day** — 4 added, DRC clean, artefacts re-exported |
 | Board size | ~140 × 85 mm | **152.000 × 106.125 mm**, over the cheap tier on both axes |
 | Gerber staleness | assumed stale | ✅ current, byte-identical |
 | J1 + J4 decision | recorded as decided | 🔴 never implemented |

@@ -43,6 +43,7 @@ FP_SW    = "Button_Switch_THT:SW_PUSH_6mm"
 FP_ISP   = "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical"
 FP_USBC  = "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12"  # = LCSC C165948
 FP_LINK  = "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"  # link pigtail
+FP_MOUNT = "MountingHole:MountingHole_2.7mm_M2.5"   # plain NPTH, no copper
 
 # J4 is the OPTIONAL alternative to J1: a real Game Boy EXT socket, so an ordinary
 # link cable plugs in instead of a soldered pigtail. Both land on the SAME nets and
@@ -184,6 +185,27 @@ if EMIT_LINK_EDGE:
     add_comp("J5", "GB-LINK-EDGE", FP_LINK_EDGE, "")
     n("LINK_VCC",("J5",1)); n("LINK_SO",("J5",2)); n("LINK_SI",("J5",3))
     n("LINK_SD",("J5",4));  n("LINK_SC",("J5",5)); n("GND",("J5",6))
+
+# ===========================================================================
+# H1-H4  M2.5 mounting holes (added 2026-07-28)
+#
+# These carry NO nets - they are plain NPTH. They are listed here anyway so that
+# re-importing this netlist does not DELETE them from the board: KiCad removes
+# footprints it cannot find in the incoming netlist, and the holes were placed
+# directly in the PCB, not via the schematic (there is no schematic - this file
+# IS the source).
+#
+# Positions were chosen against the real board, 4.0 mm inset from the Edge.Cuts
+# centreline at each corner, symmetric about the board centre (150.0, 89.0625):
+#     H1 TL ( 78.000,  40.000)      H2 TR (222.000,  40.000)
+#     H3 BL ( 78.000, 138.125)      H4 BR (222.000, 138.125)
+#     spacing 144.000 x 98.125 mm
+# Tightest clearance is H2 vs SW12 - 4.607 mm to copper, 4.475 mm to the part
+# body (a 5 mm case standoff post needs 2.5 mm). DRC: 0 violations.
+# They are marked exclude-from-BOM and exclude-from-position-files in the board.
+# ===========================================================================
+for _h in ("H1", "H2", "H3", "H4"):
+    add_comp(_h, "MountingHole_M2.5", FP_MOUNT)
 
 # ===========================================================================
 # 8x7 key matrix: 53 switches + 53 diodes
