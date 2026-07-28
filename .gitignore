@@ -46,3 +46,11 @@ sameboy_winsdl_v1.0.3/
 
 # --- KiCad/freerouting logs ---
 kicad/logs/
+
+# --- editor local-history + stray downloads ---
+# VS Code "Local History" writes shadow copies next to sources.
+.history/
+**/.history/
+# A 48 MB eVi installer once landed in this tree by accident; never commit
+# installers or other unrelated binaries here.
+*.exe
