@@ -9,9 +9,13 @@ firmware/scancode_map.h    text eol=lf linguist-generated=true
 kicad/key_positions.json   text eol=lf linguist-generated=true
 layout/keymap.svg          text eol=lf linguist-generated=true
 
-# Manufacturing outputs: keep byte-exact, never line-ending-normalised.
-*.gbr    binary
-*.drl    binary
+# Gerber (RS-274X) and Excellon drill are ASCII TEXT, not binary. Marking them
+# binary stores the working-tree bytes verbatim, which on Windows bakes CRLF
+# into the manufacturing outputs. Normalise them to LF like everything else.
+*.gbr    text eol=lf
+*.drl    text eol=lf
+
+# Genuinely binary — never normalise these.
 *.step   binary
 *.stl    binary
 *.pdf    binary
