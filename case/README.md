@@ -12,22 +12,37 @@ openscad -D 'part="top"'    -o workboy_top.stl    workboy_case.scad
 openscad -D 'part="bottom"' -o workboy_bottom.stl workboy_case.scad
 ```
 
+## The key field is generated — do not hand-edit it
+
+Plate cutouts come from **`layout/keymap.py`**, the single source of truth, via
+`layout/gen_layout.py` → **`case/key_positions.scad`**. `workboy_case.scad`
+`include`s that file and cuts one rectangle per key at its real centre, scaling
+each by its own width in key units. The build123d port imports the same data
+directly (`from keymap import centers`).
+
+So both case models already carry the **real 53-key layout**: rows of
+**12 / 11 / 11 / 11 / 8**, 52 keys at 1u plus the **5u space bar**, on a
+12 × 5 unit field at 12 mm pitch (144 × 60 mm).
+
+**After changing `keymap.py`, re-run the generator** or the case silently drifts
+from the PCB:
+```sh
+python layout/gen_layout.py    # rewrites key_positions.scad, scancode_map.h, keymap.svg, key_positions.json
+python tests/run_ci.py
+```
+
 ## Key parameters (top of the file)
 | Param | Meaning |
 |---|---|
-| `pitch` | key center-to-center spacing (mm) |
-| `cols`, `rows` | key grid (placeholder 10×5 = 50; target 53) |
-| `keycap`, `cap_clear` | keycap size + plate-hole clearance |
+| `pitch` | key center-to-center spacing (mm) — **must match `PITCH` in `gen_layout.py`** |
+| `key_gap` | plate cutout = key cell minus this (cap clearance) |
+| `key_pos[]` | **generated** — `[cx, cy, width_units]` per key, origin = case centre |
 | `case_h`, `wall`, `plate_th`, `floor_th` | shell dimensions |
 | `standoff_h` | PCB rest height (clears THT lead tails) |
 | `insert_d` | heat-set insert pocket dia — **verify against your inserts** |
 
 ## This is a starting point — refine before printing
-1. **Real layout:** the grid is uniform. Replace it with the actual staggered
-   QWERTY + 9 app keys + arrows + space/enter (53 keys). Easiest: export the
-   switch positions / board outline from KiCad (STEP or DXF) and align the plate
-   holes to them so caps sit over real switches.
-2. **Keycap interface:** holes are sized for floating caps captured by the plate.
+1. **Keycap interface:** holes are sized for floating caps captured by the plate.
    Tune `cap_clear` with a one-row fit-test print before committing 53 holes.
 3. **Material:** PETG for the shell (survives heat-set inserts and a warm
    console); resin for crisp legended keycaps.

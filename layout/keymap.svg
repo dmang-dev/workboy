@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="276" font-family="monospace">
 <rect width="600" height="276" fill="#161b22"/>
-<text x="6" y="17" fill="#9fb3c8" font-size="12">WorkBoy keymap — 53 keys, 8x7 matrix (label; scan code lower-right; matrix r,c upper-left)</text>
+<text x="6" y="17" fill="#9fb3c8" font-size="12">WorkBoy keymap â€” 53 keys, 8x7 matrix (label; scan code lower-right; matrix r,c upper-left)</text>
 <rect x="3" y="29" width="44.0" height="44" rx="6" fill="#21262d" stroke="#3d444d"/>
 <text x="25" y="51" fill="#e6edf3" font-size="15" text-anchor="middle" dominant-baseline="central">Clk</text>
 <text x="43" y="68" fill="#7ee787" font-size="10" text-anchor="end">01</text>
