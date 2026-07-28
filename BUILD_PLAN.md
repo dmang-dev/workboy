@@ -164,9 +164,15 @@ or more I/O, drop a status LED or a key row, or add an I²C port expander.
 
 ### 3.4 Board
 - **2-layer FR-4, 1.6 mm, 1 oz.** No impedance control needed at 8 kHz.
-- **Size ≈ 140 × 85 mm**, outline driven by the key field at ~10 mm pitch to match
-  the original's footprint; PCB tucks under the top plate. 4× M2.5 corner mounts
-  (+1 center boss if the plate spans >120 mm).
+- **Size: 152.000 × 106.125 mm** — *measured from `Edge.Cuts` in
+  `kicad/workboy.kicad_pcb` on 2026-07-28, superseding the earlier ~140 × 85 mm
+  estimate.* Area **161.31 cm²**. Outline driven by the key field at ~10 mm pitch
+  to match the original's footprint; PCB tucks under the top plate.
+  ⚠️ **Over JLCPCB's ≤100 × 100 mm bracket on both axes** — the cheap price tier in
+  §Cost does not apply. See `PREFAB_CHECKLIST.md` §5.
+- ⚠️ **4× M2.5 corner mounts are specified here but are NOT on the board** — it
+  currently has zero mounting holes. Blocking; see `PREFAB_CHECKLIST.md` §1.
+  (+1 center boss if the plate spans >120 mm.)
 - **Design-for-assembly:** all SMT (U1, passives, 53 diodes, LEDs, USB-C) on the
   **top side only** → one reflow pass → JLCPCB **Economic** single-sided placement.
   Only THT parts = 53 tact switches + ISP header + link connector.
@@ -373,7 +379,7 @@ unit ≈ **1.5–2.5 weeks** once P0–P2 are validated on breadboard.
    the Init handshake + a key on a real Game Boy with the ROM on an EverDrive.
 2. ~~KiCad netlist~~ ✅ **done** — [`kicad/workboy.net`](kicad/workboy.net) +
    [`kicad/KICAD_NETLIST.md`](kicad/KICAD_NETLIST.md). Next: import into the KiCad
-   PCB editor → **lay out** (~140×85 mm, top-side SMT, 8×7 switch grid) → export
+   PCB editor → **lay out** (152.000 × 106.125 mm as built, top-side SMT, 8×7 switch grid) → export
    **Gerbers + CPL**. (Verify the J3 USB-C and J1 link footprints first — see the
    netlist doc §4.)
 3. **Case** — import the board outline, model the parametric clamshell, print a
