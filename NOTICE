@@ -1,0 +1,64 @@
+WorkBoy — a modern, buildable recreation
+========================================
+
+Copyright (c) 2026 dmang-dev. Released under the MIT License (see LICENSE).
+
+This NOTICE records attribution and scope. It is not an additional licence
+term; LICENSE is pure MIT so that automated licence detection works.
+
+
+Not affiliated with anyone
+--------------------------
+
+This project is an independent, unofficial recreation. It is **not affiliated
+with, endorsed by, or connected to Nintendo**, Source Research & Development,
+Fabtek Inc., Montague-Weston, or any successor of those companies.
+
+"WorkBoy", "Game Boy", "Game Boy Color" and "Game Boy Advance" are used purely
+descriptively, to identify the historical device this project recreates and the
+consoles it attaches to. No claim is made to any trademark.
+
+For the record: the WorkBoy mark (USPTO serial 74239332, filed 1992-01-22) was
+**abandoned on 1994-04-21** without ever registering — an intent-to-use
+application that lapsed when the product was never released. Source Research &
+Development and Fabtek Inc. are both defunct.
+
+
+What is NOT in this repository
+------------------------------
+
+The original 1992 WorkBoy cartridge ROM is leaked, copyrighted, Nintendo-licensed
+code. It is **not** included here, is excluded by .gitignore, and must never be
+committed or distributed. Use it only for private bench reference, if at all.
+
+Also deliberately excluded: The Cutting Room Floor reference PDFs, and the
+bundled third-party emulator sources used locally for validation (GBE+, SameBoy).
+Each of those carries its own licence and upstream home.
+
+The cartridge software in `rom/` is **clean-room**: written from the documented
+wire protocol, containing no leaked code or assets.
+
+
+Attribution
+-----------
+
+- The WorkBoy link-port protocol and scan-code table were reverse-engineered by
+  **shonumi**, in the GBE+ emulator (`src/dmg/sio.cpp`). This project
+  re-verified that work independently and documents it in WORKBOY_PROTOCOL.md.
+- Historical documentation of the device draws on **The Cutting Room Floor**
+  (tcrf.net) and on the prototype recovered by **Liam Robertson**
+  (DidYouKnowGaming), supplied by **Frank Ballouz**, who oversaw WorkBoy
+  production at Fabtek.
+
+
+A note on the hardware files
+----------------------------
+
+The PCB (`kicad/`) and enclosure (`case/`) are covered by the same MIT licence
+as the rest of the repository, which is permissive and imposes no
+share-alike obligation on derived hardware.
+
+If reciprocal terms are ever wanted for the physical design, the usual choice
+for open hardware is **CERN-OHL-S v2**, applied to `kicad/` and `case/` while
+leaving firmware and cartridge software under MIT. That change can be made at
+any time without affecting anything already released.

@@ -38,8 +38,39 @@ small **5 V ATmega328P keyboard‑matrix controller** that speaks the documented
 WorkBoy serial protocol — no level shifter needed. The protocol/scan‑codes were
 reverse‑engineered by shonumi (GBE+) and re‑verified here against the real ROM.
 
+## Console compatibility
+
+**One 5 V design covers every console that can run a Game Boy / Game Boy Color
+cartridge** — including the GBA and GBA SP, whose link port switches to **5 V**
+when an 8‑bit cartridge is inserted. Only the cable plug varies.
+
+| Works | Doesn't |
+|---|---|
+| DMG‑01, Pocket, Light, Color, GBA, GBA SP | **Game Boy Micro** (GBA‑only, can't run GB/GBC carts) · **Super Game Boy** (no link port) |
+
+Full table, cable choices, and why this is **not** split into per‑console repos:
+[`COMPATIBILITY.md`](COMPATIBILITY.md).
+
+> ⚠️ GBA/SP support is documented behaviour that this project has **not yet
+> verified on a bench**. Measure before trusting it.
+
+## Licence
+
+**MIT** — see [`LICENSE`](LICENSE). Attribution, scope, and what is deliberately
+*not* in this repo are recorded in [`NOTICE`](NOTICE).
+
 ## Legal
+
+This is an independent, unofficial recreation. It is **not affiliated with,
+endorsed by, or connected to Nintendo**, Source R&D, Fabtek, or Montague‑Weston.
+"WorkBoy" and "Game Boy" are used descriptively to identify the device being
+recreated and the consoles it attaches to.
+
 The original WorkBoy ROM is leaked, copyrighted Nintendo‑licensed code — it is
 **not** included here and must not be committed or distributed. The cartridge
 software in `rom/` is **clean‑room**, written from the documented wire protocol.
 Use the leaked ROM only for private bench reference.
+
+The WorkBoy trademark (USPTO 74239332, filed 1992) was **abandoned in 1994**
+without ever registering, and both original companies are defunct — see
+[`NOTICE`](NOTICE).
