@@ -344,9 +344,17 @@ the link VCC pin (don't).
 
 | | First unit | Small batch (10–25) |
 |---|---|---|
-| **Bare PCB — this board, quoted 2026-07-28** | **$11.80 for 5** (eng. fee $4.00 + board $7.80) at 152 × 107 mm, 2-layer, 1.6 mm, HASL, 1 oz | **~$2.36/board** |
-| *(reference: same order at ≤100 × 100 mm)* | *$4.00 for 5 — board free, engineering fee only* | *~$0.80/board* |
-| **Shipping** — DHL Express (DDP), 0.40 kg | **$27.92** — *more than twice the PCBs; the real cost driver* | — |
+| **Bare PCB — this board, quoted 2026-07-28** | **$19.60 for 10** (eng. fee $4.00 + board $15.60) at 152 × 107 mm, 2-layer, 1.6 mm, HASL, 1 oz | **~$1.96/board** |
+| *(same order at qty 5)* | *$11.80 for 5 — the $4.00 engineering fee does not halve* | *~$2.36/board* |
+| *(reference: qty 5 at ≤100 × 100 mm)* | *$4.00 — board free, engineering fee only* | *~$0.80/board* |
+| **Shipping** — DHL Express (DDP) | **$28.06** at qty 10 (**$27.92** at qty 5 — it barely moves) | — |
+| **Components** (LCSC, volume breaks applied) | **$38.84 for 10** — the ATmega is 55 % of it | **~$3.88/board** |
+| **ALL-IN, self-assembled, qty 10** | **$86.50** | **$8.65/board** |
+
+**Order 10, not 5.** The fixed costs — $4.00 engineering fee, ~$28 shipping — do not
+scale, so doubling the order costs only $26.75 more and drops the per-board price
+**28 %** ($11.95 → $8.65). The extra five boards work out at ~$5.35 each. Past 10 the
+curve flattens hard: 10→20 saves only another $1.54/board, 20→30 just $0.51.
 | SMT assembly (Economic) | ~$15–35 | ~$5–12/board |
 | Parts (MCU, 53 sw, 53 diodes, passives, USB-C) | ~$10–20 | ~$8–15/unit |
 | Flash cart (reusable) | ~$30–60 once | — |

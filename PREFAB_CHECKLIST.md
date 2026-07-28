@@ -427,25 +427,50 @@ makes insertion much kinder.
 > exports needed refreshing. They did not — **J4 never existed at all**, and the
 > exports were already current. The board carries three `J` designators: J1, J2, J3.
 
-### 5. ~~Board size vs. the cost tier~~ ✅ **QUOTED 2026-07-28 — the penalty is $7.80**
+### 5. ~~Board size vs. the cost tier~~ ✅ **QUOTED 2026-07-28 — ordering 10**
 
-Live JLCPCB instant quote at **152 × 107 mm**, 5 pcs, 2-layer, FR-4 TG135, 1.6 mm,
+> ### 📦 **Decision: order 10 boards, not 5.**
+> $86.50 all-in, **$8.65/board** — 28 % cheaper per board than ordering 5, for
+> $26.75 more total. The five extra boards cost ~$5.35 each.
+
+Live JLCPCB instant quote at **152 × 107 mm**, 2-layer, FR-4 TG135, 1.6 mm,
 HASL (with lead), 1 oz, green, flying-probe tested:
 
-| Line item | |
-|---|---|
-| Engineering fee | $4.00 |
-| Board (5 pcs) | **$7.80** |
-| Build time (2 days) | $0.00 |
-| **PCB subtotal** | **$11.80** |
-| Shipping — DHL Express (DDP), 2–4 business days, 0.40 kg | $27.92 |
-| **Total** | **≈ $39.72** |
+| Line item | 5 pcs | **10 pcs (chosen)** |
+|---|---|---|
+| Engineering fee | $4.00 | **$4.00** |
+| Board | $7.80 | **$15.60** |
+| Build time (2 days) | $0.00 | **$0.00** |
+| **PCB subtotal** | $11.80 | **$19.60** |
+| Shipping — DHL Express (DDP), 2–4 days | $27.92 | **$28.06** |
+| Components (LCSC, with volume breaks) | $20.03 | **$38.84** |
+| **Total** | $59.75 | **$86.50** |
+| **Per board** | $11.95 | **$8.65** |
 
-**The earlier warning was overstated.** Yes, the board leaves JLCPCB's ≤100 × 100 mm
-bracket on both axes — but the whole cost of that is the **$7.80** board line. The
-identical order at 100 × 100 mm quotes **$4.00** (the board itself is free at that
-size; you pay only the engineering fee). So going 1.61× the area costs **$7.80**,
-not a tier jump worth redesigning around.
+**Why 10 is the sweet spot.** The fixed costs barely move: the engineering fee is
+flat $4.00 and shipping rose **14 ¢** going from 5 to 10 boards. Board cost is
+linear at ~$1.56 each. So at qty 5 you pay $7.94/board for PCB + shipping of which
+**$7.18 is fixed overhead** — at 10 that halves.
+
+| Qty | PCB + shipping | Parts | Total | Per board |
+|---|---|---|---|---|
+| 5 | $39.72 | $20.03 | $59.75 | $11.95 |
+| **10** | **$47.66** | **$38.84** | **$86.50** | **$8.65** |
+| 20 | $64.58 | $77.69 | $142.27 | $7.11 |
+| 30 | $81.58 | $116.53 | $198.11 | $6.60 |
+
+**The knee is at 10.** 5→10 saves $3.30/board; 10→20 only another $1.54, and 20→30
+just $0.51 — past 10 the fixed costs are amortised and you are mostly buying parts
+at near-flat prices.
+
+Qty 10 also **removes the MOQ waste**: you need 530 diodes and 530 switches, so the
+100-piece minimums that were mostly scrap at qty 5 get used, and the diodes cross
+the 300+ price break ($0.0124 → $0.0101).
+
+**The size penalty is only $7.80.** The board does leave JLCPCB's ≤100 × 100 mm
+bracket on both axes, but that is the entire cost of it — the identical 5-pc order
+at 100 × 100 mm quotes **$4.00** (board free, engineering fee only). Going to 1.61×
+the area is not a tier jump worth redesigning around.
 
 > 💡 **Shipping is the real cost — $27.92, over twice the PCBs.** That figure is
 > DHL Express (DDP) and is only an estimate; slower/cheaper methods normally exist
@@ -453,43 +478,36 @@ not a tier jump worth redesigning around.
 > $30.00 / Save $20.00" coupons. **If cost matters, attack shipping, not board
 > area.**
 
-#### ⚠️ That $11.80 is the **bare PCB only** — no parts, no assembly
+#### ⚠️ The PCB quote is the **bare board only** — no parts, no assembly
 
-Five blank boards. Components are a separate LCSC order. Prices checked 2026-07-28:
+Components are a separate LCSC order. Every price below was read off the vendor
+page during the 2026-07-28 audit:
 
 | Item | LCSC | Qty/board | Unit | Per board |
 |---|---|---|---|---|
 | **ATmega328P-AU** | C14877 | 1 | $2.14 | **$2.14** |
-| 1N4148W diode | C2099 | 53 | $0.0124 | $0.66 |
+| 1N4148W diode | C2099 | 53 | $0.0101 @300+ | $0.54 |
 | Tact switch | C42416249 | 53 | $0.0124 | $0.66 |
-| USB-C receptacle | C165948 | 1 | $0.1709 | $0.17 |
+| 10 µF 0805 | C15850 | 2 | $0.1004 | $0.20 |
+| USB-C receptacle | C165948 | 1 | $0.1349 @100+ | $0.13 |
+| LEDs ×3 | C2295 / C2297 | 3 | ~$0.012 | $0.04 |
 | SS14 Schottky | C2480 | 1 | $0.019 | $0.02 |
-| ISP header | C42431837 | 1 | $0.0293 | $0.03 |
-| LEDs ×3 | C2295 / C2297 | 3 | ~$0.014 | $0.04 |
-| Passives (6 caps, 11 resistors) | — | 17 | ~$0.005 | $0.09 |
-| | | | **≈ $3.86/board** | |
+| ISP header | C42431837 | 1 | $0.025 @200+ | $0.03 |
+| 11 resistors + 4× 100nF | — | 15 | ~$0.005 | $0.08 |
+| | | | **≈ $3.88/board at qty 10** | |
 
-**The MCU is 55 % of the parts cost on its own.** Everything else together is under
+**The MCU alone is 55 % of the parts cost.** Everything else together is under
 $1.75, because the two 53× lines are cheap in bulk.
-
-**All-in for a 5-board run, self-assembled:**
-
-| | |
-|---|---|
-| PCBs (5) | $11.80 |
-| Components for 5 | ≈ $19–20 *(some lines have MOQ overage — SS14 min 50)* |
-| JLCPCB shipping | $27.92 |
-| LCSC shipping | separate, varies by method/destination |
-| **Total** | **≈ $60–85 → roughly $12–17 per assembled board** |
-
-**Shipping is over half the build cost.** Both vendors are the same parent company
-but ship separately, so consolidating or choosing slower methods matters far more
-than anything on the board.
 
 > **SMT assembly is not included in any of the above.** If you want JLCPCB to place
 > the MCU, passives, diodes, LEDs and USB-C rather than hand-soldering 0402s and a
-> TQFP-32, that is their PCBA service and is quoted separately — see §6 and the cost
-> table in `BUILD_PLAN`. The 53 switches and J1 are hand-soldered either way.
+> TQFP-32, that is their PCBA service, quoted separately — see §6. The 53 switches
+> and J1 are hand-soldered either way. Note the ~$12 of Extended-part loading fees
+> (§4c) is a **per-order** cost, so it also halves per board at qty 10.
+
+> **Shipping is the single largest line at $28.06** — more than the PCBs. It barely
+> moves with quantity, which is exactly why 10 beats 5. LCSC ships separately again;
+> both vendors share a parent but not a parcel.
 
 If you ever *do* want to shrink it, the lever is the key pitch driving the outline —
 nothing electrical changes. The real pitch is **12.0 mm**, measured from the switch
@@ -588,11 +606,12 @@ coordinates** rather than hard-coded ones.
    change on the board; the exported artefacts already reflect this.
 3. ~~Check `C720477`~~ ✅ **done** (§4) — it was an SMD 4×3 mm part; the BOM now
    specifies **`C42416249`**, a real 6×6 mm THT tact on the matching footprint.
-4. ~~Get a live JLCPCB quote~~ ✅ **done** (§5) — **$11.80 for 5 boards**, plus
-   $27.92 DHL shipping.
-5. Order 5. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
-   `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless paying
-   for THT.
+4. ~~Get a live JLCPCB quote~~ ✅ **done** (§5) — **$19.60 for 10 boards** plus
+   $28.06 shipping. **10 chosen over 5**: 28 % cheaper per board for $26.75 more.
+5. **Order 10** (§5). Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv`
+   and `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless
+   paying for THT. Buy components separately from LCSC — one 100-piece lot of each
+   resistor value covers the run.
 6. ~~Case~~ ✅ **rebuilt from the board** (§2) — fits with 1.6 mm per side, all 53
    cutouts aligned. Remaining case decision is **connector access** (§7), not fit.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
@@ -615,11 +634,12 @@ coordinates** rather than hard-coded ones.
 > ⚠️ **If you hand-assemble instead**, swap the four resistors to the YAGEO codes in
 > §4 — LCSC cannot sell you the Basic ones today.
 >
-> **Cost (§5): PCBs $11.80 + components ≈ $19–20 + shipping ≈ $28 → roughly
-> $60–85 for five boards**, i.e. **$12–17 per assembled board**, self-assembled.
-> The bare-PCB quote alone is $11.80 — it does **not** include parts or assembly.
-> Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
-> `kicad/workboy_cpl_jlcpcb.csv`.
+> **Cost (§5) — ordering 10: PCBs $19.60 + components $38.84 + shipping $28.06 =
+> $86.50, or $8.65 per board** self-assembled. That is 28 % cheaper per board than
+> ordering 5, for $26.75 more total, because the $4.00 engineering fee and ~$28
+> shipping do not scale. The bare-PCB quote alone is $19.60 — it does **not** include
+> parts or assembly. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv`
+> and `kicad/workboy_cpl_jlcpcb.csv`.
 >
 > The case is rebuilt from the board file and fits, so it gates nothing either.
 >
