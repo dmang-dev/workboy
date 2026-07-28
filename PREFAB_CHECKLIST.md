@@ -198,6 +198,28 @@ are designed **without touching the board** — only the BOM line changes.
 > The `Footprint` column was also wrong (`SW-TH-6.0x6.0`, a name matching nothing);
 > it now carries LCSC's own `DIP-4P,6x6mm` string.
 
+#### 🔴 And a second wrong part number: J2
+
+Found while costing the BOM. **`C2718` is an onsemi `FDA50N50` — a 500 V, 48 A
+N-channel MOSFET**, not a 2×3 pin header. Confirmed on the LCSC product page
+(category *Discrete Semiconductors → Transistors → FETs, MOSFETs*).
+
+Replaced with **`C42431837` — JXTCONN `PH2.54-2X3P-H25`**: category *Headers, Male
+Pins*, 2×3 six-pin dual row, 2.54 mm pitch, through-hole, gold-plated, 3 A / 1 kV,
+39,180 in stock, **$0.0293 ea @ 20+**.
+
+> **Two of the fourteen BOM lines pointed at parts that could not be fitted.** Both
+> were plausible-looking C-codes that nobody had opened. If any other line matters
+> to you, open its LCSC page before ordering — the footprints are verified against
+> the real land patterns, but a part *number* is only as good as the last person who
+> checked it.
+
+#### ⚠️ `C72043` (green LED) reads "Not available now"
+
+LED2/LED3. Not a design problem — any green 0805 LED with the same polarity works,
+and `LED_0805_2012Metric` is a standard land pattern — but pick a stocked
+substitute at order time rather than letting the line fail validation.
+
 > Cheap physical settle: put a DMM across one switch before soldering 53. The legs
 > **6.5 mm** apart must beep **unpressed**; the legs **4.5 mm** apart must be open
 > until pressed.
@@ -326,6 +348,44 @@ not a tier jump worth redesigning around.
 > $30.00 / Save $20.00" coupons. **If cost matters, attack shipping, not board
 > area.**
 
+#### ⚠️ That $11.80 is the **bare PCB only** — no parts, no assembly
+
+Five blank boards. Components are a separate LCSC order. Prices checked 2026-07-28:
+
+| Item | LCSC | Qty/board | Unit | Per board |
+|---|---|---|---|---|
+| **ATmega328P-AU** | C14877 | 1 | $2.14 | **$2.14** |
+| 1N4148W diode | C2099 | 53 | $0.0124 | $0.66 |
+| Tact switch | C42416249 | 53 | $0.0124 | $0.66 |
+| USB-C receptacle | C165948 | 1 | $0.1709 | $0.17 |
+| SS14 Schottky | C2480 | 1 | $0.019 | $0.02 |
+| ISP header | C42431837 | 1 | $0.0293 | $0.03 |
+| LEDs ×3 | C2286 / C72043 | 3 | ~$0.03 | $0.09 |
+| Passives (6 caps, 11 resistors) | — | 17 | ~$0.005 | $0.09 |
+| | | | **≈ $3.86/board** | |
+
+**The MCU is 55 % of the parts cost on its own.** Everything else together is under
+$1.75, because the two 53× lines are cheap in bulk.
+
+**All-in for a 5-board run, self-assembled:**
+
+| | |
+|---|---|
+| PCBs (5) | $11.80 |
+| Components for 5 | ≈ $19–20 *(some lines have MOQ overage — SS14 min 50)* |
+| JLCPCB shipping | $27.92 |
+| LCSC shipping | separate, varies by method/destination |
+| **Total** | **≈ $60–85 → roughly $12–17 per assembled board** |
+
+**Shipping is over half the build cost.** Both vendors are the same parent company
+but ship separately, so consolidating or choosing slower methods matters far more
+than anything on the board.
+
+> **SMT assembly is not included in any of the above.** If you want JLCPCB to place
+> the MCU, passives, diodes, LEDs and USB-C rather than hand-soldering 0402s and a
+> TQFP-32, that is their PCBA service and is quoted separately — see §6 and the cost
+> table in `BUILD_PLAN`. The 53 switches and J1 are hand-soldered either way.
+
 If you ever *do* want to shrink it, the lever is the key pitch driving the outline —
 nothing electrical changes. The real pitch is **12.0 mm**, measured from the switch
 coordinates, *not* the "~10 mm" quoted in `BUILD_PLAN`; the 53 switches sit on an
@@ -439,8 +499,10 @@ coordinates** rather than hard-coded ones.
 > drill, CPL, BOM and STEP in this repo are current as of 2026-07-28 and DRC-clean
 > (**0 violations, 0 unconnected, 0 footprint errors**).
 >
-> **Cost: $11.80 for 5 boards + $27.92 shipping ≈ $39.72** (§5), plus ~$2 of
-> switches. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
+> **Cost (§5): PCBs $11.80 + components ≈ $19–20 + shipping ≈ $28 → roughly
+> $60–85 for five boards**, i.e. **$12–17 per assembled board**, self-assembled.
+> The bare-PCB quote alone is $11.80 — it does **not** include parts or assembly.
+> Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
 > `kicad/workboy_cpl_jlcpcb.csv`.
 >
 > The case is rebuilt from the board file and fits, so it gates nothing either.

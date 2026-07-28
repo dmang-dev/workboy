@@ -99,7 +99,7 @@
     (comp (ref "J2")
       (value "ISP-2x3")
       (footprint "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical")
-      (property (name "LCSC") (value "C2718")))
+      (property (name "LCSC") (value "C42431837")))
     (comp (ref "J1")
       (value "GB-LINK")
       (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")

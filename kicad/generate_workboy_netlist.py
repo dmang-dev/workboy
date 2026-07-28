@@ -159,7 +159,10 @@ n("USB_CC1", ("J3","A5")); n("USB_CC2", ("J3","B5"))
 # ===========================================================================
 # J2  ISP 2x3  (shares SPI nets -- program BEFORE attaching the link cable)
 # ===========================================================================
-add_comp("J2", "ISP-2x3", FP_ISP, "C2718")
+# C42431837 = JXTCONN PH2.54-2X3P-H25, 2x3 6-pin male header, 2.54 mm, THT.
+# It replaced C2718, which is an onsemi FDA50N50 500 V MOSFET - nothing to do
+# with a pin header. Verified on LCSC 2026-07-28.
+add_comp("J2", "ISP-2x3", FP_ISP, "C42431837")
 n("MCU_MISO",("J2",1)); n("+5V",("J2",2)); n("MCU_SCK",("J2",3))
 n("MCU_MOSI",("J2",4)); n("nRESET",("J2",5)); n("GND",("J2",6))
 
