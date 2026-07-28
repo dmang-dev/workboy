@@ -344,7 +344,9 @@ the link VCC pin (don't).
 
 | | First unit | Small batch (10–25) |
 |---|---|---|
-| Bare PCB (5-pc min, <100 mm) | ~$7–17 (gets you 5) | ~$2–4/board equiv. |
+| **Bare PCB — this board, quoted 2026-07-28** | **$11.80 for 5** (eng. fee $4.00 + board $7.80) at 152 × 107 mm, 2-layer, 1.6 mm, HASL, 1 oz | **~$2.36/board** |
+| *(reference: same order at ≤100 × 100 mm)* | *$4.00 for 5 — board free, engineering fee only* | *~$0.80/board* |
+| **Shipping** — DHL Express (DDP), 0.40 kg | **$27.92** — *more than twice the PCBs; the real cost driver* | — |
 | SMT assembly (Economic) | ~$15–35 | ~$5–12/board |
 | Parts (MCU, 53 sw, 53 diodes, passives, USB-C) | ~$10–20 | ~$8–15/unit |
 | Flash cart (reusable) | ~$30–60 once | — |

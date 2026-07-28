@@ -300,21 +300,41 @@ makes insertion much kinder.
 > exports needed refreshing. They did not — **J4 never existed at all**, and the
 > exports were already current. The board carries three `J` designators: J1, J2, J3.
 
-### 5. Board size vs. the cost tier — **worse than written**
-The real board is **152.000 × 106.125 mm** (§2), not the ~140 × 85 mm this section
-used to assume. That matters for the quote: it exceeds JLCPCB's ≤100 × 100 mm
-bracket on **both** axes (X by 52.0 mm, Y by 6.125 mm), and its **161.31 cm²** is
-**1.61×** that bracket's 100 cm² ceiling.
+### 5. ~~Board size vs. the cost tier~~ ✅ **QUOTED 2026-07-28 — the penalty is $7.80**
 
-So the cheap "5 boards for $7–17" line in `BUILD_PLAN.md:338` **does not apply at
-all** — it is a sub-100 mm price. Get a live quote at **152 × 107 mm**, 2-layer,
-1.6 mm, 1 oz, HASL, 5 pcs before committing.
+Live JLCPCB instant quote at **152 × 107 mm**, 5 pcs, 2-layer, FR-4 TG135, 1.6 mm,
+HASL (with lead), 1 oz, green, flying-probe tested:
 
-If the price is unacceptable, the lever is the key pitch driving the outline —
-nothing electrical needs to change to shrink it. Note the real pitch is
-**12.0 mm**, measured from the switch coordinates in the board, *not* the "~10 mm"
-quoted in `BUILD_PLAN`; the 53 switches sit on an exact 12.0 mm grid spanning
-132 × 48 mm.
+| Line item | |
+|---|---|
+| Engineering fee | $4.00 |
+| Board (5 pcs) | **$7.80** |
+| Build time (2 days) | $0.00 |
+| **PCB subtotal** | **$11.80** |
+| Shipping — DHL Express (DDP), 2–4 business days, 0.40 kg | $27.92 |
+| **Total** | **≈ $39.72** |
+
+**The earlier warning was overstated.** Yes, the board leaves JLCPCB's ≤100 × 100 mm
+bracket on both axes — but the whole cost of that is the **$7.80** board line. The
+identical order at 100 × 100 mm quotes **$4.00** (the board itself is free at that
+size; you pay only the engineering fee). So going 1.61× the area costs **$7.80**,
+not a tier jump worth redesigning around.
+
+> 💡 **Shipping is the real cost — $27.92, over twice the PCBs.** That figure is
+> DHL Express (DDP) and is only an estimate; slower/cheaper methods normally exist
+> and the number depends on destination. The quote page was also showing "Save
+> $30.00 / Save $20.00" coupons. **If cost matters, attack shipping, not board
+> area.**
+
+If you ever *do* want to shrink it, the lever is the key pitch driving the outline —
+nothing electrical changes. The real pitch is **12.0 mm**, measured from the switch
+coordinates, *not* the "~10 mm" quoted in `BUILD_PLAN`; the 53 switches sit on an
+exact 12.0 mm grid spanning 132 × 48 mm.
+
+> Quoted from dimensions, not from an upload. Once the real gerbers are parsed the
+> figure can move slightly — but the board is well inside standard capabilities
+> (2-layer, 0.25 mm track, 0.15 mm clearance, 0.3 mm drill), so no special-case
+> surcharge is expected.
 
 ### 6. Assembly split — outsource the switches or not?
 - **SMT only** (recommended in `BUILD_PLAN`): JLCPCB does the MCU, passives, 53
@@ -403,7 +423,8 @@ coordinates** rather than hard-coded ones.
    change on the board; the exported artefacts already reflect this.
 3. ~~Check `C720477`~~ ✅ **done** (§4) — it was an SMD 4×3 mm part; the BOM now
    specifies **`C42416249`**, a real 6×6 mm THT tact on the matching footprint.
-4. Get a live JLCPCB quote at **152 × 107 mm** (§5).
+4. ~~Get a live JLCPCB quote~~ ✅ **done** (§5) — **$11.80 for 5 boards**, plus
+   $27.92 DHL shipping.
 5. Order 5. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
    `kicad/workboy_cpl_jlcpcb.csv`. Hand-solder switches + connector unless paying
    for THT.
@@ -412,14 +433,15 @@ coordinates** rather than hard-coded ones.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
-> ### 🟢 **Ready to order.**
+> ### 🟢 **Ready to order — nothing outstanding.**
 > Every blocker is closed: mounting holes added, J3 moved to the edge, J4 deferred
-> to rev B, and the switch part number corrected. The gerbers, drill, CPL, BOM and
-> STEP in this repo are current as of 2026-07-28 and DRC-clean
+> to rev B, the switch part number corrected, and the board quoted. The gerbers,
+> drill, CPL, BOM and STEP in this repo are current as of 2026-07-28 and DRC-clean
 > (**0 violations, 0 unconnected, 0 footprint errors**).
 >
-> **The one thing left is a live JLCPCB quote at 152 × 107 mm** (§5) — a price
-> check, not an engineering task.
+> **Cost: $11.80 for 5 boards + $27.92 shipping ≈ $39.72** (§5), plus ~$2 of
+> switches. Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
+> `kicad/workboy_cpl_jlcpcb.csv`.
 >
 > The case is rebuilt from the board file and fits, so it gates nothing either.
 >
