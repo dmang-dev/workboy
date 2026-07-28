@@ -229,10 +229,10 @@ value, package and availability* — not just existence.
 | J3 USB-C | `C165948` | **Korean Hroparts TYPE-C-31-M-12** · 246,285 · $0.17 | ✅ *(also settles §3)* |
 | SW1–53 tact | `C42416249` | SHOU HAN SH-6X6X8H-CJ · DIP-4P 6×6 · 8,480 | ✅ *(fixed, §4)* |
 | J2 ISP header | `C42431837` | JXTCONN PH2.54-2X3P-H25 · 2×3 male THT · 39,180 | ✅ *(fixed, §4)* |
-| R1–R3 10k 0402 | `C25744` | UNI-ROYAL 0402WGF1002TCE · 10 kΩ 0402 1% — right part | ⚠️ **out of stock** |
-| R4–R6 220R 0402 | `C25091` | UNI-ROYAL 0402WGF2200TCE · 220 Ω 0402 1% — right part | ⚠️ **out of stock** |
-| R7–R9 1k 0402 | `C11702` | UNI-ROYAL 0402WGF1001TCE · 1 kΩ 0402 1% — right part | ⚠️ **out of stock** |
-| R10,R11 5.1k 0402 | `C25905` | UNI-ROYAL 0402WGF5101TCE · 5.1 kΩ 0402 1% — right part | ⚠️ **out of stock** |
+| R1–R3 10k 0402 | ~~`C25744`~~ → **`C60490`** | was UNI-ROYAL 0402WGF1002TCE — right part, **out of stock** | ✅ **replaced** |
+| R4–R6 220R 0402 | ~~`C25091`~~ → **`C112291`** | was UNI-ROYAL 0402WGF2200TCE — right part, **out of stock** | ✅ **replaced** |
+| R7–R9 1k 0402 | ~~`C11702`~~ → **`C106235`** | was UNI-ROYAL 0402WGF1001TCE — right part, **out of stock** | ✅ **replaced** |
+| R10,R11 5.1k 0402 | ~~`C25905`~~ → **`C105872`** | was UNI-ROYAL 0402WGF5101TCE — right part, **out of stock** | ✅ **replaced** |
 | LED1 red "0805" | ~~`C2286`~~ → **`C2295`** | was KENTO **KT-0603R — 0603**, not 0805 | 🔴 **wrong package — fixed** |
 | LED2,3 green "0805" | ~~`C72043`~~ → **`C2297`** | was EVERLIGHT 19-217 — **0603** *and* unavailable | 🔴 **wrong package — fixed** |
 
@@ -246,23 +246,48 @@ part's own body, not the pad.
 Replaced with the same manufacturer's genuine 0805 parts, both well stocked:
 **`C2295` KT-0805R** (red, 101,200) and **`C2297` KT-0805G** (green, 1,996,800).
 
-#### ⚠️ All four 0402 resistors are out of stock
+#### ✅ All four 0402 resistors re-specified to in-stock parts
 
-Right value, right package, right tolerance — but the UNI-ROYAL `0402WGF*TCE`
-series is **out of stock at LCSC and absent from JLCPCB's assembly library**
-(searched `0402WGF1002TCE` — no results). LCSC's alternates are third-party
-listings with 60,000-piece minimums and 9–14 day lead times.
+The UNI-ROYAL `0402WGF*TCE` series was the right value, package and tolerance but
+is **out of stock at LCSC and absent from JLCPCB's assembly library** (searched
+`0402WGF1002TCE` directly — no results). Replaced with the YAGEO **`RC0402FR-07`**
+series, the standard 1 % 0402 jellybean, all deep in stock:
 
-**This is a shopping problem, not a design problem.** 0402 chip resistors are the
-most commoditised parts that exist; any 10k/220R/1k/5.1k 0402 works and the board
-does not change. **Substitute at order time, choosing from JLCPCB's *Basic* parts
-library** — Basic parts avoid the ~$3-per-unique-part extended fee, and passive
-stock churns weekly so pinning an MPN now would just go stale again.
+| Ref | Value | LCSC | MPN | Stock | @100 |
+|---|---|---|---|---|---|
+| R1–R3 | 10 kΩ | **`C60490`** | RC0402FR-0710KL | 1,233,200 | $0.0059 |
+| R4–R6 | 220 Ω | **`C112291`** | RC0402FR-07220RL | 20,400 | $0.0054 |
+| R7–R9 | 1 kΩ | **`C106235`** | RC0402FR-071KL | 555,200 | $0.0062 |
+| R10,R11 | 5.1 kΩ | **`C105872`** | RC0402FR-075K1L | 1,443,500 | $0.0054 |
 
-> **Tally: 4 of 14 lines named a part that could not be fitted** (2 outright wrong
-> parts, 2 wrong package), and 4 more name parts you cannot currently buy. The
-> footprints were all verified against real land patterns — it was the *part
-> numbers* that were unreviewed. Worth remembering for any future BOM here.
+Identical spec to what they replace: **0402, ±1 %, 62.5 mW, 50 V, ±100 ppm/℃, thick
+film.** Each was verified individually against its own LCSC page — value, package,
+tolerance, power and live stock — with the stock read from the page **body**, not
+the title (see the trap note below).
+
+**MOQ is 100 pieces in multiples of 100**, about **$0.55 per value**, so one lot of
+each covers ~30 boards. Trivial, but you cannot buy three.
+
+> ⚠️ **LCSC pages do not show JLCPCB's Basic-vs-Extended classification.** If you
+> send this BOM to JLCPCB **PCBA** rather than hand-assembling, check that status in
+> their parts library — it drives the ~$3-per-unique-extended-part fee. Stock and
+> price above are LCSC's own, which is what matters for a parts order.
+
+> 🪤 **The stock trap:** every LCSC product page has `... | In Stock | LCSC
+> Electronics` in its `<title>` as **static SEO boilerplate — even for
+> out-of-stock parts**. It fooled this review once. Read stock from the page body,
+> where an unavailable part shows "Out of Stock" and a "Notify Me" button instead of
+> "Add to Cart".
+
+> **Tally: 8 of 14 lines were wrong.** Four named a part that could not be fitted
+> (2 outright wrong parts, 2 wrong package) and four named parts that could not be
+> bought. All eight are now corrected and individually verified. The footprints had
+> been checked against real land patterns all along — it was the *part numbers* that
+> nobody had ever opened.
+>
+> **Every line is now confirmed against its own LCSC page**, with stock read from
+> the page body. No board change came out of any of it: the `.kicad_pcb` carries no
+> LCSC part numbers, so the gerbers, drill and CPL were never affected.
 
 > Cheap physical settle: put a DMM across one switch before soldering 53. The legs
 > **6.5 mm** apart must beep **unpressed**; the legs **4.5 mm** apart must be open
@@ -537,16 +562,19 @@ coordinates** rather than hard-coded ones.
 7. Bring-up: **program the ATmega *before* attaching the link cable** — ISP shares
    the SPI pins. Then follow `BUILD_PLAN` §8.
 
-> ### 🟢 **The BOARD is ready to order.**
-> Every board-level blocker is closed: mounting holes added, J3 moved to the edge,
-> J4 deferred to rev B. The gerbers, drill, CPL and STEP are current as of
-> 2026-07-28 and DRC-clean (**0 violations, 0 unconnected, 0 footprint errors**).
+> ### 🟢 **Ready to order — board and BOM both.**
+> Every blocker is closed: mounting holes added, J3 moved to the edge, J4 deferred
+> to rev B, and **all 14 BOM lines individually verified against LCSC** (§4b) —
+> eight of them had to be corrected. The gerbers, drill, CPL, BOM and STEP are
+> current as of 2026-07-28 and DRC-clean (**0 violations, 0 unconnected, 0 footprint
+> errors**), and every part is a real, in-stock, correctly-packaged component.
 >
-> ⚠️ **The BOM needs one shopping pass before you buy.** All 14 lines were audited
-> (§4b): four named parts that could not be fitted — now corrected — and **the four
-> 0402 resistor lines name parts that are currently unbuyable**. Swap them for any
-> in-stock 0402 of the same value, ideally from JLCPCB's *Basic* library. No board
-> change; the footprints are verified.
+> Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
+> `kicad/workboy_cpl_jlcpcb.csv`.
+>
+> If you send it to JLCPCB **PCBA** rather than hand-assembling, check the
+> Basic-vs-Extended status of each part in their library first — LCSC pages do not
+> show it, and it drives the per-unique-extended-part fee.
 >
 > **Cost (§5): PCBs $11.80 + components ≈ $19–20 + shipping ≈ $28 → roughly
 > $60–85 for five boards**, i.e. **$12–17 per assembled board**, self-assembled.

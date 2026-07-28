@@ -122,17 +122,22 @@ for ref in ("C5", "C6"):
 # ===========================================================================
 # Resistors
 # ===========================================================================
-add_comp("R1", "10k",  FP_R, "C25744"); n("nRESET",  ("R1",1)); n("+5V", ("R1",2))   # reset pull-up
-add_comp("R2", "10k",  FP_R, "C25744"); n("nSS",     ("R2",1)); n("GND", ("R2",2))   # /SS strap low
-add_comp("R3", "10k",  FP_R, "C25744"); n("MCU_SCK", ("R3",1)); n("GND", ("R3",2))   # SCK idle low
-add_comp("R4", "220",  FP_R, "C25091"); n("LINK_SI", ("R4",1)); n("MCU_MISO",("R4",2))
-add_comp("R5", "220",  FP_R, "C25091"); n("LINK_SO", ("R5",1)); n("MCU_MOSI",("R5",2))
-add_comp("R6", "220",  FP_R, "C25091"); n("LINK_SC", ("R6",1)); n("MCU_SCK", ("R6",2))
-add_comp("R7", "1k",   FP_R, "C11702"); n("+5V",     ("R7",1)); n("LED1_A",  ("R7",2))
-add_comp("R8", "1k",   FP_R, "C11702"); n("NET_PB6", ("R8",1)); n("LED2_A",  ("R8",2))
-add_comp("R9", "1k",   FP_R, "C11702"); n("NET_PB7", ("R9",1)); n("LED3_A",  ("R9",2))
-add_comp("R10","5.1k", FP_R, "C25905"); n("USB_CC1", ("R10",1)); n("GND", ("R10",2))
-add_comp("R11","5.1k", FP_R, "C25905"); n("USB_CC2", ("R11",1)); n("GND", ("R11",2))
+# YAGEO RC0402FR-07 series, 0402 1% 62.5mW 50V. These replaced the UNI-ROYAL
+# 0402WGF*TCE parts, which are the right value and package but are out of stock at
+# LCSC and absent from JLCPCB's assembly library. Verified individually 2026-07-28.
+# MOQ is 100 in multiples of 100 - about $0.55 a value, so buy one lot of each.
+add_comp("R1", "10k",  FP_R, "C60490");  n("nRESET",  ("R1",1)); n("+5V", ("R1",2))   # reset pull-up
+add_comp("R2", "10k",  FP_R, "C60490");  n("nSS",     ("R2",1)); n("GND", ("R2",2))   # /SS strap low
+add_comp("R3", "10k",  FP_R, "C60490");  n("MCU_SCK", ("R3",1)); n("GND", ("R3",2))   # SCK idle low
+add_comp("R4", "220",  FP_R, "C112291"); n("LINK_SI", ("R4",1)); n("MCU_MISO",("R4",2))
+add_comp("R5", "220",  FP_R, "C112291"); n("LINK_SO", ("R5",1)); n("MCU_MOSI",("R5",2))
+add_comp("R6", "220",  FP_R, "C112291"); n("LINK_SC", ("R6",1)); n("MCU_SCK", ("R6",2))
+# ~3 mA per LED off the 5V rail: 3V across 1k = 9 mW, well inside the 62.5 mW part.
+add_comp("R7", "1k",   FP_R, "C106235"); n("+5V",     ("R7",1)); n("LED1_A",  ("R7",2))
+add_comp("R8", "1k",   FP_R, "C106235"); n("NET_PB6", ("R8",1)); n("LED2_A",  ("R8",2))
+add_comp("R9", "1k",   FP_R, "C106235"); n("NET_PB7", ("R9",1)); n("LED3_A",  ("R9",2))
+add_comp("R10","5.1k", FP_R, "C105872"); n("USB_CC1", ("R10",1)); n("GND", ("R10",2))
+add_comp("R11","5.1k", FP_R, "C105872"); n("USB_CC2", ("R11",1)); n("GND", ("R11",2))
 
 # ===========================================================================
 # LEDs (pad1=K -> GND, pad2=A -> resistor)
