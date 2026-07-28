@@ -246,32 +246,32 @@ part's own body, not the pad.
 Replaced with the same manufacturer's genuine 0805 parts, both well stocked:
 **`C2295` KT-0805R** (red, 101,200) and **`C2297` KT-0805G** (green, 1,996,800).
 
-#### ✅ All four 0402 resistors re-specified to in-stock parts
+#### ⚖️ The 0402 resistors depend on **who assembles the board**
 
-The UNI-ROYAL `0402WGF*TCE` series was the right value, package and tolerance but
-is **out of stock at LCSC and absent from JLCPCB's assembly library** (searched
-`0402WGF1002TCE` directly — no results). Replaced with the YAGEO **`RC0402FR-07`**
-series, the standard 1 % 0402 jellybean, all deep in stock:
+The two catalogues disagree, and the right part number is different for each path:
 
-| Ref | Value | LCSC | MPN | Stock | @100 |
-|---|---|---|---|---|---|
-| R1–R3 | 10 kΩ | **`C60490`** | RC0402FR-0710KL | 1,233,200 | $0.0059 |
-| R4–R6 | 220 Ω | **`C112291`** | RC0402FR-07220RL | 20,400 | $0.0054 |
-| R7–R9 | 1 kΩ | **`C106235`** | RC0402FR-071KL | 555,200 | $0.0062 |
-| R10,R11 | 5.1 kΩ | **`C105872`** | RC0402FR-075K1L | 1,443,500 | $0.0054 |
+| | LCSC retail (hand-buy) | JLCPCB library (PCBA) |
+|---|---|---|
+| **UNI-ROYAL `0402WGF*TCE`** | ❌ out of stock | ✅ **Basic**, stocked (1.1–2.1 M) |
+| **YAGEO `RC0402FR-07*`** | ✅ in stock (0.2–1.4 M) | ⚠️ **Extended** (per-part fee) |
 
-Identical spec to what they replace: **0402, ±1 %, 62.5 mW, 50 V, ±100 ppm/℃, thick
-film.** Each was verified individually against its own LCSC page — value, package,
-tolerance, power and live stock — with the stock read from the page **body**, not
-the title (see the trap note below).
+Electrically identical — **0402, ±1 %, 62.5 mW, 50 V, ±100 ppm/℃, thick film** — so
+this is purely a sourcing choice.
 
-**MOQ is 100 pieces in multiples of 100**, about **$0.55 per value**, so one lot of
-each covers ~30 boards. Trivial, but you cannot buy three.
+**`workboy_jlcpcb_bom.csv` carries the UNI-ROYAL parts**, because it is the JLCPCB
+*assembly* BOM and `BUILD_PLAN` outsources SMT. JLCPCB sources from its own library,
+where these are Basic and in stock, so LCSC's retail shortage is irrelevant and you
+avoid four Extended-part fees.
 
-> ⚠️ **LCSC pages do not show JLCPCB's Basic-vs-Extended classification.** If you
-> send this BOM to JLCPCB **PCBA** rather than hand-assembling, check that status in
-> their parts library — it drives the ~$3-per-unique-extended-part fee. Stock and
-> price above are LCSC's own, which is what matters for a parts order.
+| Ref | Value | PCBA (in the BOM) | Hand-build alternative |
+|---|---|---|---|
+| R1–R3 | 10 kΩ | **`C25744`** 0402WGF1002TCE | `C60490` RC0402FR-0710KL |
+| R4–R6 | 220 Ω | **`C25091`** 0402WGF2200TCE | `C112291` RC0402FR-07220RL |
+| R7–R9 | 1 kΩ | **`C11702`** 0402WGF1001TCE | `C106235` RC0402FR-071KL |
+| R10,R11 | 5.1 kΩ | **`C25905`** 0402WGF5101TCE | `C105872` RC0402FR-075K1L |
+
+> **If you hand-assemble, swap in the right-hand column** — LCSC cannot sell you the
+> left-hand parts today. MOQ there is 100 in multiples of 100, ~$0.55 per value.
 
 > 🪤 **The stock trap:** every LCSC product page has `... | In Stock | LCSC
 > Electronics` in its `<title>` as **static SEO boilerplate — even for
@@ -288,6 +288,42 @@ each covers ~30 boards. Trivial, but you cannot buy three.
 > **Every line is now confirmed against its own LCSC page**, with stock read from
 > the page body. No board change came out of any of it: the `.kicad_pcb` carries no
 > LCSC part numbers, so the gerbers, drill and CPL were never affected.
+
+### 4c. JLCPCB **Basic vs Extended** — every SMT part checked (2026-07-28)
+
+Extended parts carry a per-unique-part loading fee, so this drives assembly cost
+more than the components do. Checked directly in JLCPCB's parts library:
+
+| Part | LCSC | Class | JLC stock | @1+ |
+|---|---|---|---|---|
+| 100nF 0402 | `C1525` | ✅ **Basic** | 46,782,818 | $0.0053 |
+| 10 µF 0805 | `C15850` | ✅ **Basic** | 10,801,486 | $0.1191 |
+| SS14 | `C2480` | ✅ **Basic** | 2,084,080 | $0.0189 |
+| Green LED 0805 | `C2297` | ✅ **Basic** | 2,977,165 | $0.0162 |
+| 10 kΩ 0402 | `C25744` | ✅ **Basic** | — | — |
+| 220 Ω 0402 | `C25091` | ✅ **Basic** | — | — |
+| 1 kΩ 0402 | `C11702` | ✅ **Basic** | 1,120,826 | — |
+| 5.1 kΩ 0402 | `C25905` | ✅ **Basic** | 2,109,090 | — |
+| **ATmega328P-AU** | `C14877` | ⚠️ Extended | 29,242 | $2.4159 |
+| **1N4148W** ×53 | `C2099` | ⚠️ Extended | 61,717 | $0.0123 |
+| **USB-C** | `C165948` | ⚠️ Extended | 264,067 | $0.1843 |
+| **Red LED 0805** | `C2295` | ⚠️ Extended | 102,716 | $0.0115 |
+
+**8 Basic, 4 Extended.** Keeping the UNI-ROYAL resistors (§4) rather than the YAGEO
+ones cut Extended from 8 to 4 — worth roughly $12 in loading fees, i.e. more than
+the bare PCBs cost.
+
+The four that remain are hard to avoid: the MCU, the USB-C receptacle and the
+switching diode have no Basic equivalent for this design. Only the **red LED** is
+casually swappable — its green sibling `C2297` *is* Basic, so if you want one fewer
+Extended line, use a Basic red 0805 or make the power LED green too.
+
+> 🪤 **JLCPCB's page title lies the same way LCSC's does.** Every search renders
+> `No Results Found for <code>` into `<title>` **before** the client-side fetch
+> returns, then the body fills in with the real hit. Judging by the title reports a
+> part as missing when it is right there. This produced a wrong conclusion earlier in
+> this very review — the UNI-ROYAL resistors were reported absent from JLCPCB's
+> library when they are in fact **Basic and stocked**. Read the body, not the title.
 
 > Cheap physical settle: put a DMM across one switch before soldering 53. The legs
 > **6.5 mm** apart must beep **unpressed**; the legs **4.5 mm** apart must be open
@@ -572,9 +608,12 @@ coordinates** rather than hard-coded ones.
 > Upload `kicad/workboy_gerbers.zip`, `workboy_jlcpcb_bom.csv` and
 > `kicad/workboy_cpl_jlcpcb.csv`.
 >
-> If you send it to JLCPCB **PCBA** rather than hand-assembling, check the
-> Basic-vs-Extended status of each part in their library first — LCSC pages do not
-> show it, and it drives the per-unique-extended-part fee.
+> **Basic/Extended is settled too** (§4c): **8 Basic, 4 Extended** — MCU, USB-C,
+> 1N4148W and the red LED. The BOM deliberately carries the JLCPCB-Basic resistors,
+> which saved four Extended-part fees (~$12, more than the PCBs cost).
+>
+> ⚠️ **If you hand-assemble instead**, swap the four resistors to the YAGEO codes in
+> §4 — LCSC cannot sell you the Basic ones today.
 >
 > **Cost (§5): PCBs $11.80 + components ≈ $19–20 + shipping ≈ $28 → roughly
 > $60–85 for five boards**, i.e. **$12–17 per assembled board**, self-assembled.
