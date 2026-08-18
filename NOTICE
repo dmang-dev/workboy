@@ -32,8 +32,9 @@ code. It is **not** included here, is excluded by .gitignore, and must never be
 committed or distributed. Use it only for private bench reference, if at all.
 
 Also deliberately excluded: The Cutting Room Floor reference PDFs, and the
-bundled third-party emulator sources used locally for validation (GBE+, SameBoy).
-Each of those carries its own licence and upstream home.
+third-party emulators used locally for validation (GBE+, SameBoy). Those live in
+a gitignored `reference/` directory; each carries its own licence and upstream
+home, and EMULATOR_VALIDATION.md says where to fetch them.
 
 The cartridge software in `rom/` is **clean-room**: written from the documented
 wire protocol, containing no leaked code or assets.

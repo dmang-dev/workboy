@@ -40,11 +40,12 @@ DMGWYE-0.781.*
 # --- KiCad local/user state ---
 *.kicad_prl
 
-# --- bundled emulator sources / archives (local reference only) ---
-gbe-plus-master/
-gbe_1_10/
-SameBoy-1.0.3/
-sameboy_winsdl_v1.0.3/
+# --- local reference material: never committed, never distributed ---
+# reference/ holds the third-party emulators used to validate the protocol
+# (GBE+ and SameBoy, source + Windows builds). Each carries its own licence and
+# upstream home -- see NOTICE. Fetch them yourself; nothing in this repo builds
+# from them. EMULATOR_VALIDATION.md documents the expected layout.
+reference/
 *.zip
 *.7z
 # ...except the fab deliverable: JLCPCB wants a single zip upload.
