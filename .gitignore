@@ -47,6 +47,9 @@ SameBoy-1.0.3/
 sameboy_winsdl_v1.0.3/
 *.zip
 *.7z
+# ...except the fab deliverable: JLCPCB wants a single zip upload.
+# Re-zip it whenever the Gerbers are re-exported (see kicad/PCB_README.md).
+!kicad/workboy_gerbers.zip
 
 # --- KiCad/freerouting logs ---
 kicad/logs/
@@ -58,3 +61,8 @@ kicad/logs/
 # A 48 MB eVi installer once landed in this tree by accident; never commit
 # installers or other unrelated binaries here.
 *.exe
+
+# --- personalized notes: kept locally, never published ---
+# SHOPPING_LIST.md is written to one specific builder's kit and inventory.
+# The generic, public version of it lives in README.md ("What you'll need").
+SHOPPING_LIST.md

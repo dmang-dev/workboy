@@ -12,7 +12,7 @@ software cartridge.
 - `rom/` — clean-room GBDK cartridge: notepad + **clock w/ set** + **calculator** + **phone book (32 KB battery SRAM)**. **Builds 128 KB MBC1+RAM+BAT.**
 - `kicad/` — netlist + **DRC-clean routed board** ([`workboy.kicad_pcb`](kicad/workboy.kicad_pcb), 0 violations), **Gerbers** (`gerber/` / `workboy_gerbers.zip`), **CPL** ([`workboy_cpl_jlcpcb.csv`](kicad/workboy_cpl_jlcpcb.csv)); pipeline in [`PCB_README.md`](kicad/PCB_README.md)
 - `case/` — [`OpenSCAD`](case/workboy_case.scad) + [`build123d`](case/workboy_case_b123d.py) enclosures (real key layout; export STL/STEP, import the board STEP)
-- [`workboy_jlcpcb_bom.csv`](workboy_jlcpcb_bom.csv) — assembly BOM · [`SHOPPING_LIST.md`](SHOPPING_LIST.md) — what to buy · [`EMULATOR_VALIDATION.md`](EMULATOR_VALIDATION.md) — validate vs the real ROM
+- [`workboy_jlcpcb_bom.csv`](workboy_jlcpcb_bom.csv) — assembly BOM · [`README.md`](README.md#what-youll-need-to-build-one) — what to buy · [`EMULATOR_VALIDATION.md`](EMULATOR_VALIDATION.md) — validate vs the real ROM
 - `tests/` — [`protocol_sim.py`](tests/protocol_sim.py) (16 checks) + [`run_ci.py`](tests/run_ci.py); CI in [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
 > **Sourcing note:** the `tcrf.net/Workboy` web page currently serves a

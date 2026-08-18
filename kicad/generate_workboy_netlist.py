@@ -3,7 +3,7 @@
 generate_workboy_netlist.py
 ---------------------------------------------------------------------------
 Emits a KiCad netlist (.net, "export version E") for the WorkBoy keyboard
-controller PCB described in C:\\workboy\\BUILD_PLAN.md (section 3).
+controller PCB described in BUILD_PLAN.md (section 3).
 
 Pure standard-library Python (no deps). Import the resulting workboy.net into
 KiCad's PCB editor:  File > Import > Netlist...  (KiCad 7/8), then lay out the

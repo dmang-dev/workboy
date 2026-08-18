@@ -48,5 +48,5 @@ a secondary sanity check.
 ## Re-running the smoke test
 ```powershell
 # from gbe_1_10/CURRENT, WorkBoy already enabled in gbe.ini
-.\gbe_plus.exe "C:\workboy\DMGWYE-0.781.gb"
+.\gbe_plus.exe "<path-to-your-rom>\DMGWYE-0.781.gb"
 ```

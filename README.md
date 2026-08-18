@@ -54,6 +54,53 @@ Full table, cable choices, and why this is **not** split into per‑console repo
 > ⚠️ GBA/SP support is documented behaviour that this project has **not yet
 > verified on a bench**. Measure before trusting it.
 
+## What you'll need to build one
+
+Nothing here is exotic. Rough 2026 USD; the board is most of the cost.
+
+**Console side**
+| Item | Why | ~$ |
+|---|---|---|
+| A Game Boy that runs GB/GBC carts | the target console — see the compatibility table above | — |
+| Flash cart + microSD (EZ-Flash Junior, EverDrive GB, …) | runs `rom/workboy_homebrew.gb`. SD-backed saves mean the phone book persists with **no cart battery** | 25–70 |
+| A cheap DMG/GBC link cable to cut | the plug end *is* the connector — see below | 5–8 |
+
+**The keyboard board**
+| Item | Why | ~$ |
+|---|---|---|
+| Bare PCB from JLCPCB, qty 10 | zip up `kicad/gerber/` and upload it. ~$19.60 + shipping | 48 |
+| Components per [`workboy_jlcpcb_bom.csv`](workboy_jlcpcb_bom.csv) | one 100-pc lot of each resistor value covers the run. The ATmega is 55 % of it | 39 |
+| ~60× 6×6 mm THT tact switches (LCSC **C42416249**) | the 53 keys + spares. ⚠️ *Not* C720477 — that is an SMD 4×3 mm part and will not fit | 2 |
+| 2×3 2.54 mm pin header | the ISP header (J2), for flashing | 1 |
+| M2.5 brass heat-set inserts + screws | fasten the printed clamshell | 10 |
+| *(optional)* blank tactile keycaps | nicer than printed; legends are non-standard anyway | 6 |
+
+Ordering **10 boards** costs $86.50 all-in ($8.65/board) versus $59.75 for 5 —
+28 % cheaper per board, because the engineering fee and shipping don't scale.
+
+**Tools**
+- **An ISP programmer.** An **Arduino Uno running the stock ArduinoISP sketch** is
+  the cheapest route and doubles as the breadboard prototype MCU (it's a 5 V
+  ATmega328P, so it talks to the DMG link directly). A USBasp works too.
+  ⚠️ **An ST-Link will not work** — it speaks SWD/JTAG/SWIM, and the ATmega needs
+  ISP. `firmware/platformio.ini` already ships a commented `stk500v1` block for
+  the Arduino-as-ISP path.
+- **A logic analyzer** (any cheap 8-channel 24 MHz sigrok/PulseView clone, ~$10) —
+  verifying the SPI handshake and clock edge is the single most useful bring-up check.
+- Soldering iron, solder, flux · breadboard + dupont wires · 3D printer + PETG/PLA.
+
+**The link connector — the one part with no catalog option**
+There is no reliably-purchasable bare DMG link plug. Either **cut a third-party
+link cable** (most reliable — keep the 4 used wires SO/SI/SC/GND, and *meter them
+before soldering*: the two ends are deliberately cross-wired, so one end's SO is
+the other's SI), or **3D-print the plug** — e.g. svender's
+[DMG link cable plug](https://www.thingiverse.com/thing:6924711), which uses 6 pins
+harvested from female USB sockets. Breakout PCBs exist but still need a cable.
+
+**Suggested order of purchase.** Buy the logic analyzer and a link cable first and
+run the P0/P1 protocol test on a breadboard — prove the handshake before spending
+on the PCB. Order boards, switches and inserts only once that works.
+
 ## Licence
 
 **MIT** — see [`LICENSE`](LICENSE). Attribution, scope, and what is deliberately
