@@ -6,10 +6,11 @@ firmware/ROM logic is already verified two ways (source-match against GBE+'s
 `workboy_process`, and the 16-check `tests/protocol_sim.py`); this is the live
 cross-check.
 
-## Getting the emulators
+## What you need, and where it goes
 
-They are **not** in this repo — each carries its own licence and upstream home, so
-`reference/` is gitignored. Fetch them yourself and lay them out like this:
+None of it is in this repo. The emulators each carry their own licence and
+upstream home; the ROM is leaked and copyrighted. All of it lives under a
+gitignored `reference/`:
 
 ```
 reference/
@@ -17,10 +18,13 @@ reference/
   gbe-plus-master/        GBE+ source (sio.cpp)        (same repo, source zip)
   sameboy_winsdl_v1.0.3/  SameBoy 1.0.3 Windows SDL    https://github.com/LIJI32/SameBoy
   SameBoy-1.0.3/          SameBoy source (Core/workboy.c)
+  DMGWYE-0.781.gb         the leaked 1992 cartridge ROM -- source it yourself
+  DMGWYE-0.781.sav        its save file, written at runtime
 ```
 
-Every path below is relative to the repository root. Nothing in the build depends
-on these — they are for validation only.
+Every path below is relative to the repository root. **Nothing in the build
+depends on any of this** — delete `reference/` entirely and `tests/run_ci.py`
+still passes. It exists only for this cross-check.
 
 ## Status (done here)
 - GBE+ configured for WorkBoy: `reference/gbe_1_10/CURRENT/gbe.ini` →
@@ -36,7 +40,7 @@ on these — they are for validation only.
    ```
 2. Confirm **Options ▸ Emulated Serial Device = WorkBoy** (or that `gbe.ini` has
    `[#sio_device:22]`), core = **DMG-GBC**.
-3. **File ▸ Load Game** → `..\..\..\DMGWYE-0.781.gb`. The WorkBoy productivity menu
+3. **File ▸ Load Game** → `..\..\DMGWYE-0.781.gb`. The WorkBoy productivity menu
    should appear (clock / calculator / phone book / etc.).
 4. The emulated WorkBoy maps your **PC keyboard** to WorkBoy keys. Type letters,
    toggle CAPS/NUM, press the app keys — confirm each does what

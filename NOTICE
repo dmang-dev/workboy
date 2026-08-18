@@ -31,10 +31,18 @@ The original 1992 WorkBoy cartridge ROM is leaked, copyrighted, Nintendo-license
 code. It is **not** included here, is excluded by .gitignore, and must never be
 committed or distributed. Use it only for private bench reference, if at all.
 
-Also deliberately excluded: The Cutting Room Floor reference PDFs, and the
-third-party emulators used locally for validation (GBE+, SameBoy). Those live in
-a gitignored `reference/` directory; each carries its own licence and upstream
-home, and EMULATOR_VALIDATION.md says where to fetch them.
+It, its save file, The Cutting Room Floor reference PDFs, and the third-party
+emulators used for validation (GBE+, SameBoy) all live in a gitignored
+`reference/` directory. Two different reasons converge there: the ROM and the
+PDFs are other people's copyrighted work that this project has no right to
+redistribute, and the emulators are freely licensed but carry their own terms
+and upstream homes. EMULATOR_VALIDATION.md documents the layout and where to
+fetch what is fetchable. Nothing in the build reads that directory.
+
+Build toolchains (GBDK-2020, Freerouting, KiCad, PlatformIO) are likewise not
+vendored -- they are installed from upstream and CI fetches them per run. They
+are redistributable, but several are GPL-licensed, and bundling them would
+attach copyleft obligations to what is otherwise a clean MIT repository.
 
 The cartridge software in `rom/` is **clean-room**: written from the documented
 wire protocol, containing no leaked code or assets.
